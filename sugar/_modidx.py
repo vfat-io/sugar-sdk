@@ -10,10 +10,11 @@ d = { 'settings': { 'branch': 'main',
                               'sugar.config.SugarConfig.__repr__': ('config.html#sugarconfig.__repr__', 'sugar/config.py'),
                               'sugar.config.SugarConfig.__str__': ('config.html#sugarconfig.__str__', 'sugar/config.py'),
                               'sugar.config.SugarConfig.get_config': ('config.html#sugarconfig.get_config', 'sugar/config.py')},
+            'sugar.helpers': {'sugar.helpers.normalize_address': ('helpers.html#normalize_address', 'sugar/helpers.py')},
             'sugar.token': { 'sugar.token.Token': ('token.html#token', 'sugar/token.py'),
                              'sugar.token.Token.from_tuple': ('token.html#token.from_tuple', 'sugar/token.py'),
                              'sugar.token.Token.get_all_listed_tokens': ('token.html#token.get_all_listed_tokens', 'sugar/token.py'),
                              'sugar.token.Token.get_all_tokens': ('token.html#token.get_all_tokens', 'sugar/token.py'),
                              'sugar.token.Token.get_by_token_address': ('token.html#token.get_by_token_address', 'sugar/token.py'),
                              'sugar.token.Token.value_from_bigint': ('token.html#token.value_from_bigint', 'sugar/token.py')},
-            'sugar.web3': {'sugar.web3.normalize_address': ('web3.html#normalize_address', 'sugar/web3.py')}}}
+            'sugar.web3': {}}}

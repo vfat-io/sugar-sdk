@@ -5,7 +5,7 @@ __all__ = ['SugarConfig']
 
 # %% ../src/config.ipynb 3
 import os
-from .web3 import normalize_address
+from .helpers import normalize_address
 from typing import Literal
 
 # %% ../src/config.ipynb 4
