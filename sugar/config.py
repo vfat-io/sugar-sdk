@@ -10,25 +10,41 @@ from typing import Literal
 
 # %% ../src/config.ipynb 4
 class SugarConfig:
-    web3_provoider_uri: str = os.environ["WEB3_PROVIDER_URI"]
-    lp_sugar_address: str = os.environ["LP_SUGAR_ADDRESS"]
-    token_address: str = normalize_address(os.getenv("TOKEN_ADDRESS", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db"))
-    # price_oracle_address: str = os.environ["PRICE_ORACLE_ADDRESS"]
-    price_batch_size: int = int(os.getenv("PRICE_BATCH_SIZE","40"))
-    protocol_name: Literal["velo", "aero"] = os.getenv("PROTOCOL_NAME","velo")
-    good_enough_pagination_limit: int = int(os.getenv("GOOD_ENOUGH_PAGINATION_LIMIT","2000"))
+    rpc_uri: str = os.getenv("SUGAR_RPC_URI", "https://optimism-mainnet.wallet.coinbase.com")
+    sugar_contract_addr: str = os.getenv("SUGAR_CONTRACT_ADDR", "0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2")
+    token_addr: str = normalize_address(os.getenv("SUGAR_TOKEN_ADDR", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db"))
+    price_batch_size: int = int(os.getenv("SUGAR_PRICE_BATCH_SIZE","40"))
+    protocol_name: Literal["velo", "aero"] = os.getenv("SUGAR_PROTOCOL_NAME","velo")
+    pagination_limit: int = int(os.getenv("SUGAR_PAGINATION_LIMIT","2000"))
+
+    
+    
+    # PRICE_ORACLE_ADDRESS=0xcA97e5653d775cA689BED5D0B4164b7656677011
+    # CONNECTOR_TOKENS_ADDRESSES=0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db,0x4200000000000000000000000000000000000042,0x4200000000000000000000000000000000000006,0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9,0x1f32b1c2345538c0c6f582fcb022739c4a194ebb,0xbfd291da8a403daaf7e5e9dc1ec0aceacd4848b9,0xc3864f98f2a61a7caeb95b039d031b4e2f55e0e9,0x9485aca5bbbe1667ad97c7fe7c4531a624c8b1ed,0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1
+    # STABLE_TOKEN_ADDRESS=0x7F5c764cBc14f9669B88837ca1490cCa17c31607
+    # GOOD_ENOUGH_PAGINATION_LIMIT=2000
+
 
     @staticmethod
     def get_config(): return SugarConfig()
 
     def __str__(self):
-        return f"web3_provoider_uri: {self.web3_provoider_uri}\nlp_sugar_address: {self.lp_sugar_address}\ntoken_address: {self.token_address}\nprice_batch_size: {self.price_batch_size}\nprotocol_name: {self.protocol_name}\ngood_enough_pagination_limit: {self.good_enough_pagination_limit}"
-    
+        # go over all attributes of self
+        lines = ["🍭 Sugar Config:","----------------"]
+        attributes = [attr for attr in dir(self) if not attr.startswith('_')]
+        for attr in attributes:
+            if callable(getattr(self, attr)):  # Skip methods
+                continue
+            value = getattr(self, attr)
+            lines.append(f"{attr}: {value}")
+        return "\n".join(lines)
+        
+        
     def __repr__(self): return str(self)
 
 
 # # token we are converting from
-# TOKEN_ADDRESS = normalize_address(os.environ["TOKEN_ADDRESS"])
+# price_oracle_address: str = os.environ["PRICE_ORACLE_ADDRESS"]
 # # token we are converting to
 # STABLE_TOKEN_ADDRESS = os.environ["STABLE_TOKEN_ADDRESS"]
 # # connector tokens for the pricing oracle

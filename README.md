@@ -11,7 +11,10 @@ pip install sugar
 
 **TODO**: push to pypi
 
-Sugar configuration is available through `sugar.config` module
+### Configuration
+
+Sugar configuration is available through `sugar.config` module. Here’s
+what default config looks like
 
 ``` python
 from sugar.config import  SugarConfig
@@ -19,12 +22,27 @@ from sugar.config import  SugarConfig
 SugarConfig.get_config()
 ```
 
-    web3_provoider_uri: https://optimism-mainnet.wallet.coinbase.com
-    lp_sugar_address: 0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2
-    token_address: 0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db
+    🍭 Sugar Config:
+    ----------------
+    pagination_limit: 2000
     price_batch_size: 40
     protocol_name: velo
-    good_enough_pagination_limit: 2000
+    rpc_uri: https://optimism-mainnet.wallet.coinbase.com
+    sugar_contract_addr: 0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2
+    token_addr: 0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db
+
+Sugar can be configured using env variables:
+
+| config | env | default value |
+|----|----|----|
+| rpc_uri | `SUGAR_RPC_URI` | https://optimism-mainnet.wallet.coinbase.com |
+| sugar_contract_addr | `SUGAR_CONTRACT_ADDR` | 0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2 |
+| token_addr | `SUGAR_TOKEN_ADDR` | 0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db |
+| price_batch_size | `SUGAR_PRICE_BATCH_SIZE` | 40 |
+| protocol_name | `SUGAR_PROTOCOL_NAME` | velo |
+| pagination_limit | `SUGAR_PAGINATION_LIMIT` | 2000 |
+
+### Listing tokens
 
 You can list all tokens using Token API
 
