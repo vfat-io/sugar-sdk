@@ -9,12 +9,12 @@ from .helpers import normalize_address
 from typing import Literal, List
 
 # %% ../src/config.ipynb 4
-DEFAULT_CONNECTORS = "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db,0x4200000000000000000000000000000000000042,0x4200000000000000000000000000000000000006,0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9,0x1f32b1c2345538c0c6f582fcb022739c4a194ebb,0xbfd291da8a403daaf7e5e9dc1ec0aceacd4848b9,0xc3864f98f2a61a7caeb95b039d031b4e2f55e0e9,0x9485aca5bbbe1667ad97c7fe7c4531a624c8b1ed,0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1" 
+DEFAULT_CONNECTORS = "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db,0x4200000000000000000000000000000000000042,0x4200000000000000000000000000000000000006,0x9bcef72be871e61ed4fbbc7630889bee758eb81d,0x2e3d870790dc77a83dd1d18184acc7439a53f475,0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9,0x1f32b1c2345538c0c6f582fcb022739c4a194ebb,0xbfd291da8a403daaf7e5e9dc1ec0aceacd4848b9,0xc3864f98f2a61a7caeb95b039d031b4e2f55e0e9,0x9485aca5bbbe1667ad97c7fe7c4531a624c8b1ed,0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1,0x73cb180bf0521828d8849bc8cf2b920918e23032,0x6806411765af15bddd26f8f544a34cc40cb9838b,0x6c2f7b6110a37b3b0fbdd811876be368df02e8b0,0xc5b001dc33727f8f26880b184090d3e252470d45,0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40,0xc40f949f8a4e094d1b49a23ea9241d289b7b2819,0x94b008aa00579c1307b0ef2c499ad98a8ce58e58,0x0b2c639c533813f4aa9d7837caf62653d097ff85" 
 
 class SugarConfig:
     rpc_uri: str = os.getenv("SUGAR_RPC_URI", "https://optimism-mainnet.wallet.coinbase.com")
     sugar_contract_addr: str = os.getenv("SUGAR_CONTRACT_ADDR", "0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2")
-    price_oracle_contract_addr: str = os.getenv("SUGAR_PRICE_ORACLE_ADDR", "0xcA97e5653d775cA689BED5D0B4164b7656677011")
+    price_oracle_contract_addr: str = os.getenv("SUGAR_PRICE_ORACLE_ADDR", "0x59114D308C6DE4A84F5F8cD80485a5481047b99f")
     token_addr: str = normalize_address(os.getenv("SUGAR_TOKEN_ADDR", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db"))
     stable_token_addr: str = normalize_address(os.getenv("SUGAR_STABLE_TOKEN_ADDR", "0x7F5c764cBc14f9669B88837ca1490cCa17c31607"))
     connector_tokens_addrs: List[str] = list(map(lambda a: normalize_address(a), os.getenv("SUGAR_CONNECTOR_TOKENS_ADDRS", DEFAULT_CONNECTORS).split(",")))
@@ -38,25 +38,3 @@ class SugarConfig:
         
         
     def __repr__(self): return str(self)
-
-
-# # token we are converting from
-# price_oracle_address: str = os.environ["PRICE_ORACLE_ADDRESS"]
-# # token we are converting to
-# STABLE_TOKEN_ADDRESS = os.environ["STABLE_TOKEN_ADDRESS"]
-# # connector tokens for the pricing oracle
-# # see: https://github.com/velodrome-finance/oracle
-# # how often ticker bots update
-# BOT_TICKER_INTERVAL_MINUTES = int(os.environ["BOT_TICKER_INTERVAL_MINUTES"])
-# # caching time for sugar tokens calls
-# SUGAR_TOKENS_CACHE_MINUTES = int(os.environ["SUGAR_TOKENS_CACHE_MINUTES"])
-# # caching time for sugar liquidity pools calls
-# SUGAR_LPS_CACHE_MINUTES = int(os.environ["SUGAR_LPS_CACHE_MINUTES"])
-# # caching time for oracle price calls
-# ORACLE_PRICES_CACHE_MINUTES = int(os.environ["ORACLE_PRICES_CACHE_MINUTES"])
-
-# # pagination limit for pools
-# POOL_PAGE_SIZE = 500
-
-# # image shown on discord embeds for pool stats
-# UI_POOL_STATS_THUMBNAIL = os.environ["UI_POOL_STATS_THUMBNAIL"]

@@ -36,19 +36,19 @@ class Price:
         cls, tokens: Tuple[Token], stable_token: str, connector_tokens: Tuple[str]
     ):
         price_oracle = w3.eth.contract(address=config.price_oracle_contract_addr, abi=price_oracle_abi)
-        pricing_token_list = (
-            list(map(lambda t: t.token_address, tokens))
-            + list(connector_tokens)
-            + [stable_token]
-        )
-        prices = await price_oracle.functions.getManyRatesWithConnectors(len(tokens), pricing_token_list).call()
+        prices = await price_oracle.functions.getManyRatesWithCustomConnectors(
+            list(map(lambda t: t.token_address, tokens)),
+            stable_token,
+            False, # use wrappers
+            connector_tokens,
+            10 # threshold_filer
+        ).call()
 
         results = []
 
         for cnt, price in enumerate(prices):
-            # XX: decimals are auto set to 18, see
-            # https://github.com/velodrome-finance/oracle/blob/main/contracts/VeloOracle.sol#L126
-            results.append(Price(token=tokens[cnt], price=price / 10**18))
+            # 6 decimals for USDC
+            results.append(Price(token=tokens[cnt], price=price / 10**6))
 
         return results
 
