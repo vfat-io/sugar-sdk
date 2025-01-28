@@ -46,7 +46,6 @@ class Token:
     #@cache_in_seconds(SUGAR_TOKENS_CACHE_MINUTES * 60)
     async def get_all_tokens(cls) -> List["Token"]:
         config = SugarConfig.get_config()
-        print(config)
         sugar = w3.eth.contract(address=config.sugar_contract_addr, abi=lp_sugar)
         tokens = await sugar.functions.tokens(config.pagination_limit, 0, ADDRESS_ZERO, []).call()
         return list(map(lambda t: Token.from_tuple(t), tokens))
