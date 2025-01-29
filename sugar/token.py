@@ -6,7 +6,6 @@ __all__ = ['Token']
 # %% ../src/token.ipynb 2
 from typing import Tuple, List, Optional
 from dataclasses import dataclass
-from .web3 import w3
 from .helpers import normalize_address, ADDRESS_ZERO
 from .abi import lp_sugar
 from .config import SugarConfig
@@ -46,9 +45,10 @@ class Token:
     #@cache_in_seconds(SUGAR_TOKENS_CACHE_MINUTES * 60)
     async def get_all_tokens(cls) -> List["Token"]:
         config = SugarConfig.get_config()
-        sugar = w3.eth.contract(address=config.sugar_contract_addr, abi=lp_sugar[config.protocol_name])
+        sugar = config.web3.eth.contract(address=config.sugar_contract_addr, abi=lp_sugar[config.protocol_name])
         tokens = await sugar.functions.tokens(config.pagination_limit, 0, ADDRESS_ZERO, []).call()
         return list(map(lambda t: Token.from_tuple(t), tokens))
+        
 
     @classmethod
     async def get_by_token_address(cls, token_address: str) -> Optional["Token"]:

@@ -4,7 +4,6 @@
 __all__ = ['w3']
 
 # %% ../src/web3.ipynb 2
-import os
 from web3 import AsyncWeb3, AsyncHTTPProvider
 from .config import SugarConfig
 
