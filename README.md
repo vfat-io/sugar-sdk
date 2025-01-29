@@ -16,23 +16,127 @@ pip install git+https://github.com/velodrome-finance/sugar-sdk
 Sugar configuration is available through `sugar.config` module. Here’s
 what default config looks like
 
+## Aero quickstart
+
+``` python
+from sugar.token import Token
+from sugar.config import SugarConfig
+
+SugarConfig.aero()
+
+# listing first 5 tokens for brevity
+(await Token.get_all_tokens())[:5]
+```
+
+    BadFunctionCallOutput: Could not transact with/call contract function, is contract deployed correctly and chain synced?
+    [0;31m---------------------------------------------------------------------------[0m
+    [0;31mInsufficientDataBytes[0m                     Traceback (most recent call last)
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/web3/contract/utils.py:517[0m, in [0;36masync_call_contract_function[0;34m(async_w3, address, normalizers, abi_element_identifier, transaction, block_id, contract_abi, fn_abi, state_override, ccip_read_enabled, decode_tuples, *args, **kwargs)[0m
+    [1;32m    516[0m [38;5;28;01mtry[39;00m:
+    [0;32m--> 517[0m     output_data [38;5;241m=[39m [43masync_w3[49m[38;5;241;43m.[39;49m[43mcodec[49m[38;5;241;43m.[39;49m[43mdecode[49m[43m([49m[43moutput_types[49m[43m,[49m[43m [49m[43mreturn_data[49m[43m)[49m
+    [1;32m    518[0m [38;5;28;01mexcept[39;00m DecodingError [38;5;28;01mas[39;00m e:
+    [1;32m    519[0m     [38;5;66;03m# Provide a more helpful error message than the one provided by[39;00m
+    [1;32m    520[0m     [38;5;66;03m# eth-abi-utils[39;00m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/codec.py:162[0m, in [0;36mABIDecoder.decode[0;34m(self, types, data, strict)[0m
+    [1;32m    160[0m stream [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mstream_class(data)
+    [0;32m--> 162[0m [38;5;28;01mreturn[39;00m cast(Tuple[Any, [38;5;241m.[39m[38;5;241m.[39m[38;5;241m.[39m], [43mdecoder[49m[43m([49m[43mstream[49m[43m)[49m)
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:131[0m, in [0;36mBaseDecoder.__call__[0;34m(self, stream)[0m
+    [1;32m    130[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21m__call__[39m([38;5;28mself[39m, stream: ContextFramesBytesIO) [38;5;241m-[39m[38;5;241m>[39m Any:
+    [0;32m--> 131[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mdecode[49m[43m([49m[43mstream[49m[43m)[49m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_utils/functional.py:47[0m, in [0;36mapply_to_return_value.<locals>.outer.<locals>.inner[0;34m(*args, **kwargs)[0m
+    [1;32m     45[0m [38;5;129m@functools[39m[38;5;241m.[39mwraps(fn)
+    [1;32m     46[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21minner[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs) [38;5;241m-[39m[38;5;241m>[39m T:  [38;5;66;03m# type: ignore[39;00m
+    [0;32m---> 47[0m     [38;5;28;01mreturn[39;00m [43mcallback[49m[43m([49m[43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m[43m)[49m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:224[0m, in [0;36mTupleDecoder.decode[0;34m(self, stream)[0m
+    [1;32m    222[0m [38;5;129m@to_tuple[39m
+    [1;32m    223[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21mdecode[39m([38;5;28mself[39m, stream: ContextFramesBytesIO) [38;5;241m-[39m[38;5;241m>[39m Generator[Any, [38;5;28;01mNone[39;00m, [38;5;28;01mNone[39;00m]:
+    [0;32m--> 224[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mvalidate_pointers[49m[43m([49m[43mstream[49m[43m)[49m
+    [1;32m    225[0m     [38;5;28;01mfor[39;00m decoder [38;5;129;01min[39;00m [38;5;28mself[39m[38;5;241m.[39mdecoders:
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:202[0m, in [0;36mTupleDecoder.validate_pointers[0;34m(self, stream)[0m
+    [1;32m    200[0m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(decoder, HeadTailDecoder):
+    [1;32m    201[0m     [38;5;66;03m# the next 32 bytes are a pointer[39;00m
+    [0;32m--> 202[0m     offset [38;5;241m=[39m [43mdecode_uint_256[49m[43m([49m[43mstream[49m[43m)[49m
+    [1;32m    203[0m     indicated_idx [38;5;241m=[39m current_location [38;5;241m+[39m offset
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:131[0m, in [0;36mBaseDecoder.__call__[0;34m(self, stream)[0m
+    [1;32m    130[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21m__call__[39m([38;5;28mself[39m, stream: ContextFramesBytesIO) [38;5;241m-[39m[38;5;241m>[39m Any:
+    [0;32m--> 131[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mdecode[49m[43m([49m[43mstream[49m[43m)[49m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:250[0m, in [0;36mSingleDecoder.decode[0;34m(self, stream)[0m
+    [1;32m    249[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21mdecode[39m([38;5;28mself[39m, stream):
+    [0;32m--> 250[0m     raw_data [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mread_data_from_stream[49m[43m([49m[43mstream[49m[43m)[49m
+    [1;32m    251[0m     data, padding_bytes [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39msplit_data_and_padding(raw_data)
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:389[0m, in [0;36mFixedByteSizeDecoder.read_data_from_stream[0;34m(self, stream)[0m
+    [1;32m    388[0m [38;5;28;01mif[39;00m [38;5;28mlen[39m(data) [38;5;241m!=[39m [38;5;28mself[39m[38;5;241m.[39mdata_byte_size:
+    [0;32m--> 389[0m     [38;5;28;01mraise[39;00m InsufficientDataBytes(
+    [1;32m    390[0m         [38;5;124mf[39m[38;5;124m"[39m[38;5;124mTried to read [39m[38;5;132;01m{[39;00m[38;5;28mself[39m[38;5;241m.[39mdata_byte_size[38;5;132;01m}[39;00m[38;5;124m bytes, [39m[38;5;124m"[39m
+    [1;32m    391[0m         [38;5;124mf[39m[38;5;124m"[39m[38;5;124monly got [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(data)[38;5;132;01m}[39;00m[38;5;124m bytes.[39m[38;5;124m"[39m
+    [1;32m    392[0m     )
+    [1;32m    394[0m [38;5;28;01mreturn[39;00m data
+
+    [0;31mInsufficientDataBytes[0m: Tried to read 32 bytes, only got 0 bytes.
+
+    The above exception was the direct cause of the following exception:
+
+    [0;31mBadFunctionCallOutput[0m                     Traceback (most recent call last)
+    Cell [0;32mIn[2], line 7[0m
+    [1;32m      4[0m SugarConfig[38;5;241m.[39maero()
+    [1;32m      6[0m [38;5;66;03m# listing first 5 tokens for brevity[39;00m
+    [0;32m----> 7[0m ([38;5;28;01mawait[39;00m Token[38;5;241m.[39mget_all_tokens())[:[38;5;241m5[39m]
+
+    File [0;32m~/projects/sugar-sdk/sugar/token.py:50[0m, in [0;36mToken.get_all_tokens[0;34m(cls)[0m
+    [1;32m     48[0m config [38;5;241m=[39m SugarConfig[38;5;241m.[39mget_config()
+    [1;32m     49[0m sugar [38;5;241m=[39m w3[38;5;241m.[39meth[38;5;241m.[39mcontract(address[38;5;241m=[39mconfig[38;5;241m.[39msugar_contract_addr, abi[38;5;241m=[39mlp_sugar[config[38;5;241m.[39mprotocol_name])
+    [0;32m---> 50[0m tokens [38;5;241m=[39m [38;5;28;01mawait[39;00m sugar[38;5;241m.[39mfunctions[38;5;241m.[39mtokens(config[38;5;241m.[39mpagination_limit, [38;5;241m0[39m, ADDRESS_ZERO, [])[38;5;241m.[39mcall()
+    [1;32m     51[0m [38;5;28;01mreturn[39;00m [38;5;28mlist[39m([38;5;28mmap[39m([38;5;28;01mlambda[39;00m t: Token[38;5;241m.[39mfrom_tuple(t), tokens))
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/web3/contract/async_contract.py:454[0m, in [0;36mAsyncContractFunction.call[0;34m(self, transaction, block_identifier, state_override, ccip_read_enabled)[0m
+    [1;32m    450[0m block_id [38;5;241m=[39m [38;5;28;01mawait[39;00m async_parse_block_identifier([38;5;28mself[39m[38;5;241m.[39mw3, block_identifier)
+    [1;32m    452[0m abi_element_identifier [38;5;241m=[39m abi_to_signature([38;5;28mself[39m[38;5;241m.[39mabi)
+    [0;32m--> 454[0m [38;5;28;01mreturn[39;00m [38;5;28;01mawait[39;00m async_call_contract_function(
+    [1;32m    455[0m     [38;5;28mself[39m[38;5;241m.[39mw3,
+    [1;32m    456[0m     [38;5;28mself[39m[38;5;241m.[39maddress,
+    [1;32m    457[0m     [38;5;28mself[39m[38;5;241m.[39m_return_data_normalizers,
+    [1;32m    458[0m     abi_element_identifier,
+    [1;32m    459[0m     call_transaction,
+    [1;32m    460[0m     block_id,
+    [1;32m    461[0m     [38;5;28mself[39m[38;5;241m.[39mcontract_abi,
+    [1;32m    462[0m     [38;5;28mself[39m[38;5;241m.[39mabi,
+    [1;32m    463[0m     state_override,
+    [1;32m    464[0m     ccip_read_enabled,
+    [1;32m    465[0m     [38;5;28mself[39m[38;5;241m.[39mdecode_tuples,
+    [1;32m    466[0m     [38;5;241m*[39m[38;5;28mself[39m[38;5;241m.[39margs [38;5;129;01mor[39;00m (),
+    [1;32m    467[0m     [38;5;241m*[39m[38;5;241m*[39m[38;5;28mself[39m[38;5;241m.[39mkwargs [38;5;129;01mor[39;00m {},
+    [1;32m    468[0m )
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/web3/contract/utils.py:535[0m, in [0;36masync_call_contract_function[0;34m(async_w3, address, normalizers, abi_element_identifier, transaction, block_id, contract_abi, fn_abi, state_override, ccip_read_enabled, decode_tuples, *args, **kwargs)[0m
+    [1;32m    530[0m     [38;5;28;01melse[39;00m:
+    [1;32m    531[0m         msg [38;5;241m=[39m (
+    [1;32m    532[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mCould not decode contract function call to [39m[38;5;132;01m{[39;00mabi_element_identifier[38;5;132;01m}[39;00m[38;5;124m [39m[38;5;124m"[39m
+    [1;32m    533[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mwith return data: [39m[38;5;132;01m{[39;00m[38;5;28mstr[39m(return_data)[38;5;132;01m}[39;00m[38;5;124m, output_types: [39m[38;5;132;01m{[39;00moutput_types[38;5;132;01m}[39;00m[38;5;124m"[39m
+    [1;32m    534[0m         )
+    [0;32m--> 535[0m     [38;5;28;01mraise[39;00m BadFunctionCallOutput(msg) [38;5;28;01mfrom[39;00m[38;5;250m [39m[38;5;21;01me[39;00m
+    [1;32m    537[0m _normalizers [38;5;241m=[39m itertools[38;5;241m.[39mchain(
+    [1;32m    538[0m     BASE_RETURN_NORMALIZERS,
+    [1;32m    539[0m     normalizers,
+    [1;32m    540[0m )
+    [1;32m    541[0m normalized_data [38;5;241m=[39m map_abi_data(_normalizers, output_types, output_data)
+
+    [0;31mBadFunctionCallOutput[0m: Could not transact with/call contract function, is contract deployed correctly and chain synced?
+
 ``` python
 from sugar.config import  SugarConfig
 
 SugarConfig.get_config()
 ```
 
-    🍭 Sugar Config:
-    ----------------
-    connector_tokens_addrs: ['0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', '0x4200000000000000000000000000000000000042', '0x4200000000000000000000000000000000000006', '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9', '0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb', '0xbfD291DA8A403DAAF7e5E9DC1ec0aCEaCd4848B9', '0xc3864f98f2a61A7cAeb95b039D031b4E2f55e0e9', '0x9485aca5bbBE1667AD97c7fE7C4531a624C8b1ED', '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1']
-    pagination_limit: 2000
-    price_batch_size: 40
-    price_oracle_contract_addr: 0x59114D308C6DE4A84F5F8cD80485a5481047b99f
-    protocol_name: velo
-    rpc_uri: https://optimism-mainnet.wallet.coinbase.com
-    stable_token_addr: 0x7F5c764cBc14f9669B88837ca1490cCa17c31607
-    sugar_contract_addr: 0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2
-    token_addr: 0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db
+    SugarConfig(rpc_uri='https://mainnet.base.org', sugar_contract_addr='0x92294D631E995f1dd9CeE4097426e6a71aB87Bcf', price_oracle_contract_addr='0x3B06c787711ecb5624cE65AC8F26cde10831eb0C', token_addr='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', stable_token_addr='0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA', connector_tokens_addrs=['0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', '0x940181a94A35A4569E4529A3CDfB74e38FD98631', '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', '0x4621b7A9c75199271F773Ebd9A499dbd165c3191', '0x4200000000000000000000000000000000000006', '0xB79DD08EA68A908A97220C76d19A6aA9cBDE4376', '0xf7A0dd3317535eC4f4d29ADF9d620B3d8D5D5069', '0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4', '0xCb327b99fF831bF8223cCEd12B1338FF3aA322Ff', '0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22', '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452', '0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42', '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA', '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf'], protocol_name='aero', price_batch_size=40, pagination_limit=2000)
 
 Sugar can be configured using env variables:
 
@@ -59,11 +163,107 @@ from sugar.token import Token
 (await Token.get_all_tokens())[:5]
 ```
 
-    [Token(token_address='0x46f21fDa29F1339e0aB543763FF683D399e393eC', symbol='opxveVELO', decimals=18, listed=False),
-     Token(token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True),
-     Token(token_address='0x3417E54A51924C225330f8770514aD5560B9098D', symbol='RED', decimals=18, listed=True),
-     Token(token_address='0x7F5c764cBc14f9669B88837ca1490cCa17c31607', symbol='USDC', decimals=6, listed=True),
-     Token(token_address='0x7aE97042a4A0eB4D1eB370C34BfEC71042a056B7', symbol='UNLOCK', decimals=18, listed=False)]
+    BadFunctionCallOutput: Could not transact with/call contract function, is contract deployed correctly and chain synced?
+    [0;31m---------------------------------------------------------------------------[0m
+    [0;31mInsufficientDataBytes[0m                     Traceback (most recent call last)
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/web3/contract/utils.py:517[0m, in [0;36masync_call_contract_function[0;34m(async_w3, address, normalizers, abi_element_identifier, transaction, block_id, contract_abi, fn_abi, state_override, ccip_read_enabled, decode_tuples, *args, **kwargs)[0m
+    [1;32m    516[0m [38;5;28;01mtry[39;00m:
+    [0;32m--> 517[0m     output_data [38;5;241m=[39m [43masync_w3[49m[38;5;241;43m.[39;49m[43mcodec[49m[38;5;241;43m.[39;49m[43mdecode[49m[43m([49m[43moutput_types[49m[43m,[49m[43m [49m[43mreturn_data[49m[43m)[49m
+    [1;32m    518[0m [38;5;28;01mexcept[39;00m DecodingError [38;5;28;01mas[39;00m e:
+    [1;32m    519[0m     [38;5;66;03m# Provide a more helpful error message than the one provided by[39;00m
+    [1;32m    520[0m     [38;5;66;03m# eth-abi-utils[39;00m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/codec.py:162[0m, in [0;36mABIDecoder.decode[0;34m(self, types, data, strict)[0m
+    [1;32m    160[0m stream [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mstream_class(data)
+    [0;32m--> 162[0m [38;5;28;01mreturn[39;00m cast(Tuple[Any, [38;5;241m.[39m[38;5;241m.[39m[38;5;241m.[39m], [43mdecoder[49m[43m([49m[43mstream[49m[43m)[49m)
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:131[0m, in [0;36mBaseDecoder.__call__[0;34m(self, stream)[0m
+    [1;32m    130[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21m__call__[39m([38;5;28mself[39m, stream: ContextFramesBytesIO) [38;5;241m-[39m[38;5;241m>[39m Any:
+    [0;32m--> 131[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mdecode[49m[43m([49m[43mstream[49m[43m)[49m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_utils/functional.py:47[0m, in [0;36mapply_to_return_value.<locals>.outer.<locals>.inner[0;34m(*args, **kwargs)[0m
+    [1;32m     45[0m [38;5;129m@functools[39m[38;5;241m.[39mwraps(fn)
+    [1;32m     46[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21minner[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs) [38;5;241m-[39m[38;5;241m>[39m T:  [38;5;66;03m# type: ignore[39;00m
+    [0;32m---> 47[0m     [38;5;28;01mreturn[39;00m [43mcallback[49m[43m([49m[43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m[43m)[49m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:224[0m, in [0;36mTupleDecoder.decode[0;34m(self, stream)[0m
+    [1;32m    222[0m [38;5;129m@to_tuple[39m
+    [1;32m    223[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21mdecode[39m([38;5;28mself[39m, stream: ContextFramesBytesIO) [38;5;241m-[39m[38;5;241m>[39m Generator[Any, [38;5;28;01mNone[39;00m, [38;5;28;01mNone[39;00m]:
+    [0;32m--> 224[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mvalidate_pointers[49m[43m([49m[43mstream[49m[43m)[49m
+    [1;32m    225[0m     [38;5;28;01mfor[39;00m decoder [38;5;129;01min[39;00m [38;5;28mself[39m[38;5;241m.[39mdecoders:
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:202[0m, in [0;36mTupleDecoder.validate_pointers[0;34m(self, stream)[0m
+    [1;32m    200[0m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(decoder, HeadTailDecoder):
+    [1;32m    201[0m     [38;5;66;03m# the next 32 bytes are a pointer[39;00m
+    [0;32m--> 202[0m     offset [38;5;241m=[39m [43mdecode_uint_256[49m[43m([49m[43mstream[49m[43m)[49m
+    [1;32m    203[0m     indicated_idx [38;5;241m=[39m current_location [38;5;241m+[39m offset
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:131[0m, in [0;36mBaseDecoder.__call__[0;34m(self, stream)[0m
+    [1;32m    130[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21m__call__[39m([38;5;28mself[39m, stream: ContextFramesBytesIO) [38;5;241m-[39m[38;5;241m>[39m Any:
+    [0;32m--> 131[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mdecode[49m[43m([49m[43mstream[49m[43m)[49m
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:250[0m, in [0;36mSingleDecoder.decode[0;34m(self, stream)[0m
+    [1;32m    249[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21mdecode[39m([38;5;28mself[39m, stream):
+    [0;32m--> 250[0m     raw_data [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mread_data_from_stream[49m[43m([49m[43mstream[49m[43m)[49m
+    [1;32m    251[0m     data, padding_bytes [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39msplit_data_and_padding(raw_data)
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/eth_abi/decoding.py:389[0m, in [0;36mFixedByteSizeDecoder.read_data_from_stream[0;34m(self, stream)[0m
+    [1;32m    388[0m [38;5;28;01mif[39;00m [38;5;28mlen[39m(data) [38;5;241m!=[39m [38;5;28mself[39m[38;5;241m.[39mdata_byte_size:
+    [0;32m--> 389[0m     [38;5;28;01mraise[39;00m InsufficientDataBytes(
+    [1;32m    390[0m         [38;5;124mf[39m[38;5;124m"[39m[38;5;124mTried to read [39m[38;5;132;01m{[39;00m[38;5;28mself[39m[38;5;241m.[39mdata_byte_size[38;5;132;01m}[39;00m[38;5;124m bytes, [39m[38;5;124m"[39m
+    [1;32m    391[0m         [38;5;124mf[39m[38;5;124m"[39m[38;5;124monly got [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(data)[38;5;132;01m}[39;00m[38;5;124m bytes.[39m[38;5;124m"[39m
+    [1;32m    392[0m     )
+    [1;32m    394[0m [38;5;28;01mreturn[39;00m data
+
+    [0;31mInsufficientDataBytes[0m: Tried to read 32 bytes, only got 0 bytes.
+
+    The above exception was the direct cause of the following exception:
+
+    [0;31mBadFunctionCallOutput[0m                     Traceback (most recent call last)
+    Cell [0;32mIn[3], line 4[0m
+    [1;32m      1[0m [38;5;28;01mfrom[39;00m[38;5;250m [39m[38;5;21;01msugar[39;00m[38;5;21;01m.[39;00m[38;5;21;01mtoken[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Token
+    [1;32m      3[0m [38;5;66;03m# listing first 5 tokens for brevity[39;00m
+    [0;32m----> 4[0m ([38;5;28;01mawait[39;00m Token[38;5;241m.[39mget_all_tokens())[:[38;5;241m5[39m]
+
+    File [0;32m~/projects/sugar-sdk/sugar/token.py:50[0m, in [0;36mToken.get_all_tokens[0;34m(cls)[0m
+    [1;32m     48[0m config [38;5;241m=[39m SugarConfig[38;5;241m.[39mget_config()
+    [1;32m     49[0m sugar [38;5;241m=[39m w3[38;5;241m.[39meth[38;5;241m.[39mcontract(address[38;5;241m=[39mconfig[38;5;241m.[39msugar_contract_addr, abi[38;5;241m=[39mlp_sugar)
+    [0;32m---> 50[0m tokens [38;5;241m=[39m [38;5;28;01mawait[39;00m sugar[38;5;241m.[39mfunctions[38;5;241m.[39mtokens(config[38;5;241m.[39mpagination_limit, [38;5;241m0[39m, ADDRESS_ZERO, [])[38;5;241m.[39mcall()
+    [1;32m     51[0m [38;5;28;01mreturn[39;00m [38;5;28mlist[39m([38;5;28mmap[39m([38;5;28;01mlambda[39;00m t: Token[38;5;241m.[39mfrom_tuple(t), tokens))
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/web3/contract/async_contract.py:454[0m, in [0;36mAsyncContractFunction.call[0;34m(self, transaction, block_identifier, state_override, ccip_read_enabled)[0m
+    [1;32m    450[0m block_id [38;5;241m=[39m [38;5;28;01mawait[39;00m async_parse_block_identifier([38;5;28mself[39m[38;5;241m.[39mw3, block_identifier)
+    [1;32m    452[0m abi_element_identifier [38;5;241m=[39m abi_to_signature([38;5;28mself[39m[38;5;241m.[39mabi)
+    [0;32m--> 454[0m [38;5;28;01mreturn[39;00m [38;5;28;01mawait[39;00m async_call_contract_function(
+    [1;32m    455[0m     [38;5;28mself[39m[38;5;241m.[39mw3,
+    [1;32m    456[0m     [38;5;28mself[39m[38;5;241m.[39maddress,
+    [1;32m    457[0m     [38;5;28mself[39m[38;5;241m.[39m_return_data_normalizers,
+    [1;32m    458[0m     abi_element_identifier,
+    [1;32m    459[0m     call_transaction,
+    [1;32m    460[0m     block_id,
+    [1;32m    461[0m     [38;5;28mself[39m[38;5;241m.[39mcontract_abi,
+    [1;32m    462[0m     [38;5;28mself[39m[38;5;241m.[39mabi,
+    [1;32m    463[0m     state_override,
+    [1;32m    464[0m     ccip_read_enabled,
+    [1;32m    465[0m     [38;5;28mself[39m[38;5;241m.[39mdecode_tuples,
+    [1;32m    466[0m     [38;5;241m*[39m[38;5;28mself[39m[38;5;241m.[39margs [38;5;129;01mor[39;00m (),
+    [1;32m    467[0m     [38;5;241m*[39m[38;5;241m*[39m[38;5;28mself[39m[38;5;241m.[39mkwargs [38;5;129;01mor[39;00m {},
+    [1;32m    468[0m )
+
+    File [0;32m~/projects/sugar-sdk/env/lib/python3.10/site-packages/web3/contract/utils.py:535[0m, in [0;36masync_call_contract_function[0;34m(async_w3, address, normalizers, abi_element_identifier, transaction, block_id, contract_abi, fn_abi, state_override, ccip_read_enabled, decode_tuples, *args, **kwargs)[0m
+    [1;32m    530[0m     [38;5;28;01melse[39;00m:
+    [1;32m    531[0m         msg [38;5;241m=[39m (
+    [1;32m    532[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mCould not decode contract function call to [39m[38;5;132;01m{[39;00mabi_element_identifier[38;5;132;01m}[39;00m[38;5;124m [39m[38;5;124m"[39m
+    [1;32m    533[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mwith return data: [39m[38;5;132;01m{[39;00m[38;5;28mstr[39m(return_data)[38;5;132;01m}[39;00m[38;5;124m, output_types: [39m[38;5;132;01m{[39;00moutput_types[38;5;132;01m}[39;00m[38;5;124m"[39m
+    [1;32m    534[0m         )
+    [0;32m--> 535[0m     [38;5;28;01mraise[39;00m BadFunctionCallOutput(msg) [38;5;28;01mfrom[39;00m[38;5;250m [39m[38;5;21;01me[39;00m
+    [1;32m    537[0m _normalizers [38;5;241m=[39m itertools[38;5;241m.[39mchain(
+    [1;32m    538[0m     BASE_RETURN_NORMALIZERS,
+    [1;32m    539[0m     normalizers,
+    [1;32m    540[0m )
+    [1;32m    541[0m normalized_data [38;5;241m=[39m map_abi_data(_normalizers, output_types, output_data)
+
+    [0;31mBadFunctionCallOutput[0m: Could not transact with/call contract function, is contract deployed correctly and chain synced?
 
 ### Pricing tokens
 
