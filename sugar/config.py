@@ -9,7 +9,9 @@ import os
 from dataclasses import dataclass, make_dataclass
 from .helpers import normalize_address
 from typing import Literal, List, Optional
-from web3 import AsyncWeb3, AsyncHTTPProvider
+from web3 import AsyncWeb3, AsyncHTTPProvider, Account
+from web3.eth.async_eth import AsyncContract 
+from .abi import lp_sugar, router
 
 # %% ../src/config.ipynb 5
 DEFAULT_CONNECTORS_VELO = "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db,0x4200000000000000000000000000000000000042,0x4200000000000000000000000000000000000006,0x9bcef72be871e61ed4fbbc7630889bee758eb81d,0x2e3d870790dc77a83dd1d18184acc7439a53f475,0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9,0x1f32b1c2345538c0c6f582fcb022739c4a194ebb,0xbfd291da8a403daaf7e5e9dc1ec0aceacd4848b9,0xc3864f98f2a61a7caeb95b039d031b4e2f55e0e9,0x9485aca5bbbe1667ad97c7fe7c4531a624c8b1ed,0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1,0x73cb180bf0521828d8849bc8cf2b920918e23032,0x6806411765af15bddd26f8f544a34cc40cb9838b,0x6c2f7b6110a37b3b0fbdd811876be368df02e8b0,0xc5b001dc33727f8f26880b184090d3e252470d45,0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40,0xc40f949f8a4e094d1b49a23ea9241d289b7b2819,0x94b008aa00579c1307b0ef2c499ad98a8ce58e58,0x0b2c639c533813f4aa9d7837caf62653d097ff85" 
@@ -17,13 +19,17 @@ DEFAULT_CONNECTORS_AERO = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913,0x940181a9
 
 base_default_settings = {
   "price_batch_size": int(os.getenv("SUGAR_PRICE_BATCH_SIZE","40")),
-  "pagination_limit": int(os.getenv("SUGAR_PAGINATION_LIMIT","2000"))
+  "price_threshold_filter": int(os.getenv("SUGAR_PRICE_THRESHOLD_FILTER","10")),
+  "pagination_limit": int(os.getenv("SUGAR_PAGINATION_LIMIT","2000")),
+  "pool_page_size": int(os.getenv("SUGAR_POOL_PAGE_SIZE","500"))
 }
 
 velo_default_settings = { **{
   "rpc_uri": os.getenv("SUGAR_RPC_URI", "https://optimism-mainnet.wallet.coinbase.com"),
+  "sugar_pk": os.getenv("SUGAR_PK", None),
   "sugar_contract_addr": os.getenv("SUGAR_CONTRACT_ADDR", "0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2"),
   "price_oracle_contract_addr": os.getenv("SUGAR_PRICE_ORACLE_ADDR", "0x59114D308C6DE4A84F5F8cD80485a5481047b99f"),
+  "router_contract_addr": os.getenv("SUGAR_ROUTER_ADDR", None),
   "token_addr": normalize_address(os.getenv("SUGAR_TOKEN_ADDR", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db")),
   "stable_token_addr": normalize_address(os.getenv("SUGAR_STABLE_TOKEN_ADDR", "0x7F5c764cBc14f9669B88837ca1490cCa17c31607")),
   "connector_tokens_addrs": list(map(lambda a: normalize_address(a), os.getenv("SUGAR_CONNECTOR_TOKENS_ADDRS", DEFAULT_CONNECTORS_VELO).split(","))),
@@ -32,8 +38,10 @@ velo_default_settings = { **{
 
 aero_default_settings = { **{
   "rpc_uri": os.getenv("SUGAR_RPC_URI", "https://mainnet.base.org"),
+  "sugar_pk": os.getenv("SUGAR_PK", None),
   "sugar_contract_addr": os.getenv("SUGAR_CONTRACT_ADDR", "0x92294D631E995f1dd9CeE4097426e6a71aB87Bcf"),
   "price_oracle_contract_addr": os.getenv("SUGAR_PRICE_ORACLE_ADDR", "0x3B06c787711ecb5624cE65AC8F26cde10831eb0C"),
+  "router_contract_addr": os.getenv("SUGAR_ROUTER_ADDR", "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43"),
   "token_addr": normalize_address(os.getenv("SUGAR_TOKEN_ADDR", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db")),
   "stable_token_addr": normalize_address(os.getenv("SUGAR_STABLE_TOKEN_ADDR", "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA")),
   "connector_tokens_addrs": list(map(lambda a: normalize_address(a), os.getenv("SUGAR_CONNECTOR_TOKENS_ADDRS", DEFAULT_CONNECTORS_AERO).split(","))),
@@ -43,8 +51,16 @@ aero_default_settings = { **{
 
 # %% ../src/config.ipynb 6
 def _make_config(settings, **kwargs) -> 'SugarConfig':
-    d = { **settings, **kwargs }
-    d = { **d, "web3": AsyncWeb3(AsyncHTTPProvider(d["rpc_uri"]))}
+    w3 = AsyncWeb3(AsyncHTTPProvider(settings["rpc_uri"]))
+    d = { **settings, "web3": w3, **kwargs }
+    d["sugar"] = w3.eth.contract(address=settings["sugar_contract_addr"], abi=lp_sugar[settings["protocol_name"]])
+    d["router"] = w3.eth.contract(address=settings["router_contract_addr"], abi=router[settings["protocol_name"]])
+
+    # get rid of SUGAR_PK if provided and convert it to Account instance
+    if d["sugar_pk"]:
+        d["account"] = w3.eth.account.from_key(d["sugar_pk"])
+        del d["sugar_pk"]
+
     return make_dataclass(
       SugarConfig.__name__, ((k, type(v)) for k, v in d.items())
     )(**d)
@@ -54,15 +70,22 @@ class SugarConfig:
     _instance = None
 
     rpc_uri: str
+    sugar_pk: Optional[str]
     sugar_contract_addr: str
     price_oracle_contract_addr: str
+    router_contract_addr: str
     token_addr: str
     stable_token_addr: str
     connector_tokens_addrs: List[str]
     price_batch_size: int
+    price_threshold_filter: int
     protocol_name: Literal["velo", "aero"]
     pagination_limit: int
+    pool_page_size: int
+    account: Optional[Account]
     web3: AsyncWeb3
+    sugar: AsyncContract
+    router: AsyncContract
     
     @staticmethod
     def get_config() -> 'SugarConfig':
