@@ -11,6 +11,14 @@ pip install git+https://github.com/velodrome-finance/sugar-sdk
 
 **TODO**: push to pypi
 
+``` python
+# load env
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+    True
+
 ## Aero quickstart
 
 ``` python
@@ -50,7 +58,27 @@ velo = [t for t in await Token.get_all_listed_tokens() if t.symbol == 'VELO']
 await Price.get_prices(velo)
 ```
 
-    [Price(token=Token(token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True), price=0.093559)]
+    [Price(token=Token(token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True), price=0.070724)]
+
+## Deposits
+
+In order to deposit, make sure spender’s account’s private key is
+provided via `SUGAR_PK` env var. Here’s how you can deposit
+[vAMM-USDC/AERO](https://aerodrome.finance/deposit?token0=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&token1=0x940181a94A35A4569E4529A3CDfB74e38FD98631&type=-1)
+
+``` python
+
+from sugar.config import SugarConfig
+from sugar.pool import LiquidityPool
+
+SugarConfig.aero()
+
+pools = list(filter(lambda x: "vAMM-USDC" in x.symbol and "AERO" in x.symbol, await LiquidityPool.get_pools()))
+
+# 0.02 USDC 
+deposit = Deposit(pools[0], 0.02)
+await deposit.deposit()
+```
 
 ### Configuration
 
