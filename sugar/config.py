@@ -29,7 +29,7 @@ velo_default_settings = { **{
   "sugar_pk": os.getenv("SUGAR_PK", None),
   "sugar_contract_addr": os.getenv("SUGAR_CONTRACT_ADDR", "0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2"),
   "price_oracle_contract_addr": os.getenv("SUGAR_PRICE_ORACLE_ADDR", "0x59114D308C6DE4A84F5F8cD80485a5481047b99f"),
-  "router_contract_addr": os.getenv("SUGAR_ROUTER_ADDR", None),
+  "router_contract_addr": os.getenv("SUGAR_ROUTER_ADDR", "0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858"),
   "token_addr": normalize_address(os.getenv("SUGAR_TOKEN_ADDR", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db")),
   "stable_token_addr": normalize_address(os.getenv("SUGAR_STABLE_TOKEN_ADDR", "0x7F5c764cBc14f9669B88837ca1490cCa17c31607")),
   "connector_tokens_addrs": list(map(lambda a: normalize_address(a), os.getenv("SUGAR_CONNECTOR_TOKENS_ADDRS", DEFAULT_CONNECTORS_VELO).split(","))),
