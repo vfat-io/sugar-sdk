@@ -5,126 +5,13 @@ __all__ = ['Deposit']
 
 # %% ../src/deposit.ipynb 2
 from dataclasses import dataclass
-from .config import SugarConfig
-from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp
-from .token import Token
 from .pool import LiquidityPool
 
 # %% ../src/deposit.ipynb 3
 @dataclass(frozen=True)
 class Deposit:
     """Data class for Deposits"""
-
     # pool to deposit into
     pool: LiquidityPool
     # amount of token0 for deposit
     amount_token0: float
-
-    async def set_token_allowance(self, token: Token, amount: int):
-        config = SugarConfig.get_config()
-
-        if not config.account: raise ValueError("Account not set. Do you have SUGAR_PK env var set?")
-
-        ERC20_ABI = [{
-            "constant": False,
-            "inputs": [
-                {"name": "spender", "type": "address"},
-                {"name": "amount", "type": "uint256"}
-            ],
-            "name": "approve",
-            "outputs": [{"name": "", "type": "bool"}],
-            "type": "function"
-        }]
-
-        token_contract = config.web3.eth.contract(address=normalize_address(token.token_address), abi=ERC20_ABI)
-        tx = token_contract.functions.approve(config.router_contract_addr, amount)
-        tx = await tx.build_transaction({
-            'from': config.account.address,
-            'nonce': await config.web3.eth.get_transaction_count(config.account.address),
-        })
-
-        # Sign and send transaction
-        signed_tx = config.account.sign_transaction(tx)
-        tx_hash = await config.web3.eth.send_raw_transaction(signed_tx.raw_transaction)
-
-        # Wait for transaction receipt
-        return await config.web3.eth.wait_for_transaction_receipt(tx_hash)
-
-    async def check_token_allowance(self, token: Token) -> int:
-        config = SugarConfig.get_config()
-
-        # Minimal ERC20 ABI for allowance check
-        ERC20_ABI = [{
-            "constant": True,
-            "inputs": [
-                {"name": "owner", "type": "address"},
-                {"name": "spender", "type": "address"}
-            ],
-            "name": "allowance",
-            "outputs": [{"name": "", "type": "uint256"}],
-            "type": "function"
-        }]
-
-        token_contract = config.web3.eth.contract(address=token.token_address, abi=ERC20_ABI)
-        return await token_contract.functions.allowance(config.account.address, config.router_contract_addr).call()
-
-    async def deposit(self, delay_in_minutes: float = 30, slippage: float = 0.01):
-        config = SugarConfig.get_config()
-
-        if not config.account: raise ValueError("Account not set. Do you have SUGAR_PK env var set?")
-
-        print(f"gonna deposit {self.amount_token0} {self.pool.token0.symbol} into {self.pool.symbol} from {config.account.address}")
-
-        [token0_amount, token1_amount, _] = await config.router.functions.quoteAddLiquidity(
-            self.pool.token0.token_address,
-            self.pool.token1.token_address,
-            self.pool.is_stable,
-            self.pool.factory,
-            float_to_uint256(self.amount_token0, self.pool.token0.decimals),
-            MAX_UINT256
-        ).call()
-
-        print(f"Quote: {self.pool.token0.symbol} {token0_amount / 10 ** self.pool.token0.decimals} -> {self.pool.token1.symbol} {token1_amount / 10 ** self.pool.token1.decimals}")
-
-        # set up allowance for both tokens
-        print(f"setting up allowance for {self.pool.token0.symbol}")
-        await self.set_token_allowance(self.pool.token0, token0_amount)
-
-        print(f"setting up allowance for {self.pool.token1.symbol}")
-        await self.set_token_allowance(self.pool.token1, token1_amount)
-
-        # check allowances
-        token0_allowance = await self.check_token_allowance(self.pool.token0)
-        token1_allowance = await self.check_token_allowance(self.pool.token1)
-
-        print(f"allowances: {token0_allowance}, {token1_allowance}")
-
-        # adding liquidity
-
-        params = [
-            self.pool.token0.token_address,
-            self.pool.token1.token_address,
-            self.pool.is_stable,
-            token0_amount,
-            token1_amount,
-            apply_slippage(token0_amount, slippage),
-            apply_slippage(token1_amount, slippage),
-            config.account.address,
-            get_future_timestamp(delay_in_minutes)
-        ]
-
-        print(f"adding liquidity with params: {params}")
-
-        tx = config.router.functions.addLiquidity(*params)
-
-        tx = await tx.build_transaction({
-            'from': config.account.address,
-            'nonce': await config.web3.eth.get_transaction_count(config.account.address)
-        })
-
-        # signed_tx = config.web3.eth.account.sign_transaction(tx, pk)
-        signed_tx = config.account.sign_transaction(tx)
-        tx_hash = await config.web3.eth.send_raw_transaction(signed_tx.raw_transaction)
-
-        # Wait for transaction receipt
-        return await config.web3.eth.wait_for_transaction_receipt(tx_hash)

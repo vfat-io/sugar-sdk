@@ -8,8 +8,6 @@ import functools, asyncio
 from dataclasses import dataclass
 from typing import Tuple, List
 from .token import Token
-from .config import SugarConfig
-from .abi import price_oracle as price_oracle_abi
 from .helpers import chunk
 
 # %% ../src/price.ipynb 4
@@ -26,60 +24,3 @@ class Price:
 
     @property
     def pretty_price(self) -> float: return round(self.price, 5)
-
-    @classmethod
-    # @cache_in_seconds(ORACLE_PRICES_CACHE_MINUTES * 60)
-    async def _get_prices(
-        cls, tokens: Tuple[Token], stable_token: str, connector_tokens: Tuple[str]
-    ):
-        config = SugarConfig.get_config()
-        price_oracle = config.web3.eth.contract(address=config.price_oracle_contract_addr, abi=price_oracle_abi)
-        prices = await price_oracle.functions.getManyRatesWithCustomConnectors(
-            list(map(lambda t: t.token_address, tokens)),
-            stable_token,
-            False, # use wrappers
-            connector_tokens,
-            10 # threshold_filer
-        ).call()
-
-        results = []
-
-        for cnt, price in enumerate(prices):
-            # 6 decimals for USDC
-            results.append(Price(token=tokens[cnt], price=price / 10**6))
-
-        return results
-
-    @classmethod
-    async def get_prices(
-        cls,
-        tokens: List[Token],
-        stable_token: str = SugarConfig.get_config().stable_token_addr,
-        connector_tokens: List[str] = SugarConfig.get_config().connector_tokens_addrs,
-    ) -> List["Price"]:
-        """Get prices for tokens in target stable token
-
-        Args:
-            tokens (List[Token]): tokens to get prices for
-            stable_token (str, optional): stable token to price in.
-            Defaults to STABLE_TOKEN_ADDRESS.
-            connector_tokens (List[str], optional): connector tokens to use for pricing.
-            Defaults to CONNECTOR_TOKENS_ADDRESSES.
-
-        Returns:
-            List: list of Price objects
-        """
-        config = SugarConfig.get_config()
-        batches = await asyncio.gather(
-            *map(
-                lambda ts: cls._get_prices(
-                    # XX: lists are not cacheable, convert them to tuples so lru cache is happy
-                    tuple(ts),
-                    stable_token,
-                    tuple(connector_tokens),
-                ),
-                list(chunk(tokens, config.price_batch_size)),
-            )
-        )
-        return functools.reduce(lambda l1, l2: l1 + l2, batches, [])
-

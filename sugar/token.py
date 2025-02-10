@@ -4,11 +4,9 @@
 __all__ = ['Token']
 
 # %% ../src/token.ipynb 2
-from typing import Tuple, List, Optional
+from typing import Tuple
 from dataclasses import dataclass
-from .helpers import normalize_address, ADDRESS_ZERO
-from .abi import lp_sugar
-from .config import SugarConfig
+from .helpers import normalize_address
 
 # %% ../src/token.ipynb 4
 @dataclass(frozen=True)
@@ -34,35 +32,3 @@ class Token:
             decimals=decimals,
             listed=listed,
         )
-
-    @classmethod
-    #@cache_in_seconds(SUGAR_TOKENS_CACHE_MINUTES * 60)
-    async def get_all_listed_tokens(cls) -> List["Token"]:
-        tokens = await cls.get_all_tokens()
-        return list(filter(lambda t: t.listed, tokens))
-
-    @classmethod
-    #@cache_in_seconds(SUGAR_TOKENS_CACHE_MINUTES * 60)
-    async def get_all_tokens(cls) -> List["Token"]:
-        config = SugarConfig.get_config()
-        sugar = config.web3.eth.contract(address=config.sugar_contract_addr, abi=lp_sugar[config.protocol_name])
-        tokens = await sugar.functions.tokens(config.pagination_limit, 0, ADDRESS_ZERO, []).call()
-        return list(map(lambda t: Token.from_tuple(t), tokens))
-        
-
-    @classmethod
-    async def get_by_token_address(cls, token_address: str) -> Optional["Token"]:
-        """Get details for specific token
-
-        Args:
-            token_address (str): token address
-
-        Returns:
-            Token: target token or None
-        """
-        try:
-            normalized_address = normalize_address(token_address)
-            tokens = await cls.get_all_listed_tokens()
-            return next(t for t in tokens if t.token_address == normalized_address)
-        except Exception:
-            return None
