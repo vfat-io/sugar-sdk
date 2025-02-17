@@ -5,6 +5,8 @@ jobs:
   #   uses: velodrome-finance/sugar-sdk/.github/workflows/supersim.yaml@main
   test:
     runs-on: ubuntu-latest
+    env:
+      SUGAR_PK: ${{ secrets.SUGAR_PK }}
     steps:
       - name: Set up Homebrew
         id: set-up-homebrew
