@@ -1,6 +1,6 @@
 name: Setup and run supersim
 on:
-   workflow_call:
+   workflow_dispatch:
 jobs:
   supersim:
     runs-on: ubuntu-latest
