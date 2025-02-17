@@ -7,6 +7,9 @@ jobs:
     steps:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-
       - name: Confirm forge is installed
         run: forge --version
+      - name: Install supersim
+        run: brew install ethereum-optimism/tap/supersim
+      - name: Confirm supersim is installed
+        run: supersim --version
