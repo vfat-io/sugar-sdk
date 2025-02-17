@@ -1,0 +1,10 @@
+name: Setup and run supersim
+on:  [push]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install foundry
+        run: curl -L https://foundry.paradigm.xyz | bash
+      
