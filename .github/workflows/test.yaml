@@ -1,9 +1,8 @@
-name: CI
 on:  [workflow_dispatch, pull_request, push]
 
 jobs:
+  supersim:
+    uses: velodrome-finance/sugar-sdk/.github/workflows/supersim.yaml@main
   test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: velodrome-finance/sugar-sdk/.github/workflows/supersim.yaml@main
-      - uses: fastai/workflows/nbdev-ci@master
+    steps: [uses: fastai/workflows/nbdev-ci@master]
