@@ -17,7 +17,7 @@ from .token import Token
 from .pool import LiquidityPool
 from .price import Price
 from .deposit import Deposit
-from .helpers import ADDRESS_ZERO, chunk
+from .helpers import ADDRESS_ZERO, chunk, normalize_address
 
 # %% ../src/chains.ipynb 5
 T = TypeVar('T')
@@ -201,9 +201,15 @@ async def deposit(self: Chain, deposit: Deposit, delay_in_minutes: float = 30, s
 
 # %% ../src/chains.ipynb 19
 class OPChain(Chain):
-    def __init__(self, **kwargs): super().__init__(make_op_chain_settings())
+    usdc: str = normalize_address("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
+    velo: str = normalize_address("0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db")
+
+    def __init__(self, **kwargs): super().__init__(make_op_chain_settings(**kwargs))
 
 
 # %% ../src/chains.ipynb 21
 class BaseChain(Chain):
-    def __init__(self, **kwargs): super().__init__(make_base_chain_settings())
+    usdc: str = normalize_address("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913")
+    aero: str = normalize_address("0x940181a94a35a4569e4529a3cdfb74e38fd98631")
+
+    def __init__(self, **kwargs): super().__init__(make_base_chain_settings(**kwargs))

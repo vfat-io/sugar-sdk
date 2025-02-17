@@ -5,7 +5,7 @@ __all__ = ['Price', 'Amount', 'LiquidityPool']
 
 # %% ../src/pool.ipynb 3
 from dataclasses import dataclass
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 from .token import Token
 from .helpers import normalize_address
 
@@ -87,7 +87,7 @@ class LiquidityPool:
     @classmethod
     def from_tuple(
         cls, t: Tuple, tokens: Dict[str, Token] #,prices: Dict[str, Price]
-    ) -> "LiquidityPool":
+    ) -> Optional["LiquidityPool"]:
         token0 = normalize_address(t[7])
         token1 = normalize_address(t[10])
         token0_fees = t[23]
@@ -126,6 +126,10 @@ class LiquidityPool:
         # { "name": "nfpm", "type": "address" },           <== 25
         # { "name": "alm", "type": "address" }             <== 26
 
+        token0, token1 = tokens.get(token0), tokens.get(token1)
+
+        if not token0 or not token1: return None
+
         return LiquidityPool(
             lp=normalize_address(t[0]),
             factory=normalize_address(t[18]),
@@ -134,9 +138,9 @@ class LiquidityPool:
             is_stable=t[4] == 0,
             total_supply=t[3],
             decimals=t[2],
-            token0=tokens.get(token0),
+            token0=token0,
             #reserve0=Amount.build(token0, t[8], tokens, prices),
-            token1=tokens.get(token1),
+            token1=token1,
             #reserve1=Amount.build(token1, t[11], tokens, prices),
             #token0_fees=Amount.build(token0, token0_fees, tokens, prices),
             #token1_fees=Amount.build(token1, token1_fees, tokens, prices),
