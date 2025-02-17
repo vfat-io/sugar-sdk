@@ -5,6 +5,9 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
       - name: Confirm forge is installed
