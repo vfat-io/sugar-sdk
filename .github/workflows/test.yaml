@@ -1,9 +1,10 @@
-on:  [workflow_dispatch, pull_request, push]
+on:  [pull_request, push]
 
 jobs:
-  supersim:
-    uses: velodrome-finance/sugar-sdk/.github/workflows/supersim.yaml@main
+  # supersim:
+  #   uses: velodrome-finance/sugar-sdk/.github/workflows/supersim.yaml@main
   test:
     runs-on: ubuntu-latest
-    needs: supersim
-    steps: [uses: fastai/workflows/nbdev-ci@master]
+    # needs: supersim
+    steps:
+      - uses: fastai/workflows/nbdev-ci@master
