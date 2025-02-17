@@ -5,4 +5,5 @@ jobs:
     uses: velodrome-finance/sugar-sdk/.github/workflows/supersim.yaml@main
   test:
     runs-on: ubuntu-latest
+    needs: supersim
     steps: [uses: fastai/workflows/nbdev-ci@master]
