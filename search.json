@@ -1,0 +1,212 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Sugar SDK",
+    "section": "",
+    "text": "pip install git+https://github.com/velodrome-finance/sugar-sdk\nTODO: push to pypi\n\n# load env\nfrom dotenv import load_dotenv\nload_dotenv()\n\nTrue",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "index.html#using-sugar",
+    "href": "index.html#using-sugar",
+    "title": "Sugar SDK",
+    "section": "",
+    "text": "pip install git+https://github.com/velodrome-finance/sugar-sdk\nTODO: push to pypi\n\n# load env\nfrom dotenv import load_dotenv\nload_dotenv()\n\nTrue",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "index.html#base-quickstart",
+    "href": "index.html#base-quickstart",
+    "title": "Sugar SDK",
+    "section": "Base quickstart",
+    "text": "Base quickstart\n\nfrom sugar.chains import BaseChain\n\nasync with BaseChain() as chain:\n    aero = [t for t in await chain.get_all_tokens() if t.symbol == 'AERO']\n    print(await chain.get_prices(aero))\n\n[Price(token=Token(token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True), price=0.875957)]",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "index.html#op-quickstart",
+    "href": "index.html#op-quickstart",
+    "title": "Sugar SDK",
+    "section": "OP quickstart",
+    "text": "OP quickstart",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "index.html#deposits",
+    "href": "index.html#deposits",
+    "title": "Sugar SDK",
+    "section": "Deposits",
+    "text": "Deposits\nIn order to deposit, make sure spender’s account’s private key is provided via SUGAR_PK env var. Here’s how you can deposit vAMM-USDC/AERO\nfrom sugar.chains import BaseChain\nfrom sugar.deposit import Deposit\n\nasync with BaseChain() as chain:\n    pools = await chain.get_pools()\n    pools = list(filter(lambda x: \"vAMM-USDC\" in x.symbol and \"AERO\" in x.symbol, pools))\n    # 0.02 USDC \n    await chain.deposit(Deposit(pools[0], 0.02))",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "index.html#configuration",
+    "href": "index.html#configuration",
+    "title": "Sugar SDK",
+    "section": "Configuration",
+    "text": "Configuration\nFull list of configuration parameters for Sugar. Chain IDs can be found here. Sugar uses decimal versions: Base is 8453, OP is 10.\n\n\n\n\n\n\n\n\nconfig\nenv\ndefault value\n\n\n\n\nrpc_uri\nSUGAR_RPC_URI_&lt;CHAIN_ID&gt;\nchain specific\n\n\nsugar_contract_addr\nSUGAR_CONTRACT_ADDR_&lt;CHAIN_ID&gt;\nchain specific\n\n\nprice_oracle_contract_addr\nSUGAR_PRICE_ORACLE_ADDR_&lt;CHAIN_ID&gt;\nchain specific\n\n\nrouter_contract_addr\nSUGAR_ROUTER_CONTRACT_ADDR_&lt;CHAIN_ID&gt;\nchain specific\n\n\ntoken_addr\nSUGAR_TOKEN_ADDR_&lt;CHAIN_ID&gt;\nchain specific\n\n\nstable_token_addr\nSUGAR_STABLE_TOKEN_ADDR_&lt;CHAIN_ID&gt;\nchain specific\n\n\nconnector_tokens_addrs\nSUGAR_CONNECTOR_TOKENS_ADDRS_&lt;CHAIN_ID&gt;\nchain specific\n\n\nprice_batch_size\nSUGAR_PRICE_BATCH_SIZE\n40\n\n\nprice_threshold_filter\nSUGAR_PRICE_THRESHOLD_FILTER\n10\n\n\npool_page_size\nSUGAR_POOL_PAGE_SIZE\n500\n\n\npagination_limit\nSUGAR_PAGINATION_LIMIT\n2000\n\n\n\nIn order to write to Sugar contracts, you need to set your wallet private key using env var SUGAR_PK\nYou can override specific settings in 2 ways:\n\nby setting corresponding env var: SUGAR_RPC_URI_10=https://myrpc.com\nin code:\n\nfrom sugar.chains import OPChain\n\nasync with OPChain(rpc_uri=\"https://myrpc.com\") as chain:\n    ...",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "index.html#contributing-to-sugar",
+    "href": "index.html#contributing-to-sugar",
+    "title": "Sugar SDK",
+    "section": "Contributing to Sugar",
+    "text": "Contributing to Sugar\n\nSet up and acivate python virtual env\npython3 -m venv env\nsource env/bin/activate\n\n\nInstall dependencies\npip install nbdev pre-commit\npip install -e '.[dev]'\n\n\nInstall pre-commit hooks for nbdev prep and cleanup\npre-commit install",
+    "crumbs": [
+      "Sugar SDK"
+    ]
+  },
+  {
+    "objectID": "deposit.html",
+    "href": "deposit.html",
+    "title": "Deposits",
+    "section": "",
+    "text": "source\n\nDeposit\n\n Deposit (pool:sugar.pool.LiquidityPool, amount_token0:float)\n\nData class for Deposits",
+    "crumbs": [
+      "Deposits"
+    ]
+  },
+  {
+    "objectID": "price.html",
+    "href": "price.html",
+    "title": "Token price API",
+    "section": "",
+    "text": "source\n\nPrice\n\n Price (token:sugar.token.Token, price:float)\n\n*Data class for Token Price\nbased on: https://github.com/velodrome-finance/oracle/blob/main/contracts/VeloOracle.sol*",
+    "crumbs": [
+      "Token price API"
+    ]
+  },
+  {
+    "objectID": "pool.html",
+    "href": "pool.html",
+    "title": "Liquidity pools",
+    "section": "",
+    "text": "source\n\nPrice\n\n Price (token:sugar.token.Token, price:float)\n\n*Data class for Token Price\nbased on: https://github.com/velodrome-finance/oracle/blob/main/contracts/VeloOracle.sol*\n\nsource\n\n\nAmount\n\n Amount (token:sugar.token.Token, amount:float, price:__main__.Price)\n\n\nsource\n\n\nLiquidityPool\n\n LiquidityPool (lp:str, factory:str, symbol:str, is_stable:bool,\n                total_supply:float, decimals:int,\n                token0:sugar.token.Token, token1:sugar.token.Token,\n                pool_fee:float, gauge_total_supply:float,\n                emissions_token:sugar.token.Token, nfpm:str, alm:str)\n\n*Data class for Liquidity Pool\nbased on: https://github.com/velodrome-finance/sugar/blob/v2/contracts/LpSugar.vy#L31*",
+    "crumbs": [
+      "Liquidity pools"
+    ]
+  },
+  {
+    "objectID": "chains.html",
+    "href": "chains.html",
+    "title": "⛓ Chain",
+    "section": "",
+    "text": "source\n\n\n\n Chain (settings:sugar.config.ChainSettings)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\n\n\n require_context (f:Callable[...,~T])\n\n\n\n\n\n\n\n\n\n get_all_tokens (listed_only:bool=True)\n\n\n\n\n\n\n\n\n\n get_pools ()\n\n\n\n\n\n\n\n\n\n get_prices (tokens:List[sugar.token.Token])\n\nGet prices for tokens in target stable token\n\n\n\n\n\n\n\n\n sign_and_send_tx (tx, wait:bool=True)\n\n\n\n\n\n\n\n\n\n check_token_allowance (token:sugar.token.Token, addr:str)\n\n\n\n\n\n\n set_token_allowance (token:sugar.token.Token, addr:str, amount:int)\n\n\n\n\n\n\n\n\n\n deposit (deposit:sugar.deposit.Deposit, delay_in_minutes:float=30,\n          slippage:float=0.01)",
+    "crumbs": [
+      "⛓ Chain"
+    ]
+  },
+  {
+    "objectID": "chains.html#chain-implementation",
+    "href": "chains.html#chain-implementation",
+    "title": "⛓ Chain",
+    "section": "",
+    "text": "source\n\n\n\n Chain (settings:sugar.config.ChainSettings)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\n\n\n require_context (f:Callable[...,~T])\n\n\n\n\n\n\n\n\n\n get_all_tokens (listed_only:bool=True)\n\n\n\n\n\n\n\n\n\n get_pools ()\n\n\n\n\n\n\n\n\n\n get_prices (tokens:List[sugar.token.Token])\n\nGet prices for tokens in target stable token\n\n\n\n\n\n\n\n\n sign_and_send_tx (tx, wait:bool=True)\n\n\n\n\n\n\n\n\n\n check_token_allowance (token:sugar.token.Token, addr:str)\n\n\n\n\n\n\n set_token_allowance (token:sugar.token.Token, addr:str, amount:int)\n\n\n\n\n\n\n\n\n\n deposit (deposit:sugar.deposit.Deposit, delay_in_minutes:float=30,\n          slippage:float=0.01)",
+    "crumbs": [
+      "⛓ Chain"
+    ]
+  },
+  {
+    "objectID": "chains.html#op-chain",
+    "href": "chains.html#op-chain",
+    "title": "⛓ Chain",
+    "section": "OP Chain",
+    "text": "OP Chain\n\nsource\n\nOPChain\n\n OPChain (**kwargs)\n\nInitialize self. See help(type(self)) for accurate signature.",
+    "crumbs": [
+      "⛓ Chain"
+    ]
+  },
+  {
+    "objectID": "chains.html#base-chain",
+    "href": "chains.html#base-chain",
+    "title": "⛓ Chain",
+    "section": "Base Chain",
+    "text": "Base Chain\n\nsource\n\nBaseChain\n\n BaseChain (**kwargs)\n\nInitialize self. See help(type(self)) for accurate signature.",
+    "crumbs": [
+      "⛓ Chain"
+    ]
+  },
+  {
+    "objectID": "chains.html#tests",
+    "href": "chains.html#tests",
+    "title": "⛓ Chain",
+    "section": "Tests",
+    "text": "Tests\nRun tests using mainnets for reads and simnet for writes\n\n# from sugar.chains import OPChain\n\n# async with OPChain(rpc_uri=\"http://127.0.0.1:4444\", pagination_limit=1) as chain:\n#     print(chain.settings)\n#     velo = [t for t in await chain.get_all_tokens() if t.symbol == 'VELO']\n#     print(await chain.get_prices(velo))\n\n# from sugar.chains import OPChain, BaseChain\n# from sugar.deposit import Deposit\n\n# from dotenv import load_dotenv\n# from fastcore.test import test_ne\n# import os\n\n# load_dotenv()\n\n# test_ne(os.getenv(\"SUGAR_PK\"), None)\n\n# test connection to localhost:4444\n\nimport socket\nimport sys\n\n\nhost, port ='localhost', 4444\ntry:\n    # Create socket object\n    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n    # Set timeout to 2 seconds\n    sock.settimeout(2)\n    \n    # Attempt connection\n    result = sock.connect_ex((host, port))\n    if result == 0:\n        print(f\"✅ Successfully connected to {host}:{port}\")\n    else:\n        print(f\"❌ Could not connect to {host}:{port}\")\n        print(f\"Error code: {result}\")\n    \nexcept socket.error as err:\n    print(f\"❌ Connection failed: {err}\")\nfinally:\n    sock.close()\n\n# async with OPChain() as chain:\n#     pools = await chain.get_pools()\n#     pools = list(filter(lambda x: x.token0 and x.token0.token_address == chain.usdc and x.token1.token_address == chain.velo, pools))\n#     async with OPChain(rpc_uri=\"http://127.0.0.1:4444\" ) as supersim:\n#         print(supersim.settings)\n#         # 0.02 USDC \n#         await supersim.deposit(Deposit(pools[0], 0.02))\n\n# async with BaseChain() as chain:\n#     pools = await chain.get_pools()\n#     pools = list(filter(lambda x: x.token0 and x.token0.token_address == chain.usdc and x.token1.token_address == chain.aero, pools))\n#     async with BaseChain(rpc_uri=\"http://127.0.0.1:4445\" ) as supersim:\n#         print(supersim.settings)\n#         # 0.02 USDC \n#         await supersim.deposit(Deposit(pools[0], 0.01), slippage=0.05)\n#         print(\"Done\")\n\n❌ Could not connect to localhost:4444\nError code: 111",
+    "crumbs": [
+      "⛓ Chain"
+    ]
+  },
+  {
+    "objectID": "token.html",
+    "href": "token.html",
+    "title": "Token API",
+    "section": "",
+    "text": "source\n\nToken\n\n Token (token_address:str, symbol:str, decimals:int, listed:bool)\n\nData class for Token based on: https://github.com/velodrome-finance/sugar/blob/v2/contracts/LpSugar.vy#L17",
+    "crumbs": [
+      "Token API"
+    ]
+  },
+  {
+    "objectID": "abi.html#router-abi",
+    "href": "abi.html#router-abi",
+    "title": "ABI definitions",
+    "section": "Router ABI",
+    "text": "Router ABI",
+    "crumbs": [
+      "ABI definitions"
+    ]
+  },
+  {
+    "objectID": "helpers.html",
+    "href": "helpers.html",
+    "title": "Assorted helpers",
+    "section": "",
+    "text": "source\n\namount_to_m_string\n\n amount_to_m_string (amount:float)\n\nTurns 2000000 to “2M”\n\nsource\n\n\nformat_percentage\n\n format_percentage (value:float)\n\n\nsource\n\n\nformat_currency\n\n format_currency (value:float, symbol:str='$', prefix:bool=True)\n\n\nsource\n\n\namount_to_k_string\n\n amount_to_k_string (amount:float)\n\nTurns 2000 to “2K”\n\nsource\n\n\nchunk\n\n chunk (list_to_chunk:List, n:int)\n\n\nsource\n\n\nnormalize_address\n\n normalize_address (address:str)\n\n\nsource\n\n\nfloat_to_uint256\n\n float_to_uint256 (amount:float, decimals:int=18)\n\nConvert float to uint256 with decimal scaling\n\nfloat_to_uint256(1.0, 18)\n\n1000000000000000000\n\n\n\nsource\n\n\nget_future_timestamp\n\n get_future_timestamp (deadline_minutes:float)\n\nConvert minutes from now to future unix timestamp\n\nget_future_timestamp(5)\n\n1739198221\n\n\n\nsource\n\n\napply_slippage\n\n apply_slippage (amount:int, slippage:float)",
+    "crumbs": [
+      "Assorted helpers"
+    ]
+  },
+  {
+    "objectID": "config.html",
+    "href": "config.html",
+    "title": "Configure Sugar",
+    "section": "",
+    "text": "source",
+    "crumbs": [
+      "Configure Sugar"
+    ]
+  },
+  {
+    "objectID": "config.html#op-chain-settings",
+    "href": "config.html#op-chain-settings",
+    "title": "Configure Sugar",
+    "section": "OP Chain settings",
+    "text": "OP Chain settings\n\nsource\n\nmake_op_chain_settings\n\n make_op_chain_settings (**kwargs)",
+    "crumbs": [
+      "Configure Sugar"
+    ]
+  },
+  {
+    "objectID": "config.html#base-chain-settings",
+    "href": "config.html#base-chain-settings",
+    "title": "Configure Sugar",
+    "section": "BASE Chain settings",
+    "text": "BASE Chain settings\n\nsource\n\nmake_base_chain_settings\n\n make_base_chain_settings (**kwargs)",
+    "crumbs": [
+      "Configure Sugar"
+    ]
+  }
+]
