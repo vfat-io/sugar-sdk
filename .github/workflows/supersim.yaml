@@ -5,6 +5,12 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Install foundry
-        run: curl -L https://foundry.paradigm.xyz | bash
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run tests
+        run: forge test -vvv
+
+      - name: Run snapshot
+        run: forge snapshot
       
