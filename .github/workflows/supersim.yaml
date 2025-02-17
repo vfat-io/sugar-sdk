@@ -1,8 +1,8 @@
 name: Setup and run supersim
-on:  [push]
-
+on:
+   workflow_call:
 jobs:
-  setup:
+  supersim:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Homebrew
