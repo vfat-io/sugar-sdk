@@ -29,19 +29,9 @@ async with BaseChain() as chain:
     print(await chain.get_prices(aero))
 ```
 
-    [Price(token=Token(token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True), price=0.781576)]
+    [Price(token=Token(token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True), price=0.875957)]
 
 ## OP quickstart
-
-``` python
-from sugar.chains import OPChain
-
-async with OPChain() as chain:
-    velo = [t for t in await chain.get_all_tokens() if t.symbol == 'VELO']
-    print(await chain.get_prices(velo))
-```
-
-    [Price(token=Token(token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True), price=0.073751)]
 
 ## Deposits
 
@@ -68,6 +58,7 @@ Full list of configuration parameters for Sugar. Chain IDs can be found
 
 | config | env | default value |
 |----|----|----|
+| wrapped_native_token_addr | `SUGAR_WRAPPED_NATIVE_TOKEN_ADDR_<CHAIN_ID>` | chain specific |
 | rpc_uri | `SUGAR_RPC_URI_<CHAIN_ID>` | chain specific |
 | sugar_contract_addr | `SUGAR_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
 | price_oracle_contract_addr | `SUGAR_PRICE_ORACLE_ADDR_<CHAIN_ID>` | chain specific |
