@@ -58,6 +58,8 @@ Full list of configuration parameters for Sugar. Chain IDs can be found
 
 | config | env | default value |
 |----|----|----|
+| native_token_symbol |  | ETH |
+| native_token_decimals |  | 18 |
 | wrapped_native_token_addr | `SUGAR_WRAPPED_NATIVE_TOKEN_ADDR_<CHAIN_ID>` | chain specific |
 | rpc_uri | `SUGAR_RPC_URI_<CHAIN_ID>` | chain specific |
 | sugar_contract_addr | `SUGAR_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
