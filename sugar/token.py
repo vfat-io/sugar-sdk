@@ -19,9 +19,16 @@ class Token:
     symbol: str
     decimals: int
     listed: bool
+    wrapped_token_address: str = None
 
-    def value_from_bigint(self, value: float) -> float:
-        return value / 10**self.decimals
+    @property
+    def is_native(self) -> bool: return self.wrapped_token_address is not None
+
+    def value_from_bigint(self, value: float) -> float: return value / 10**self.decimals
+
+    @classmethod
+    def make_native_token(cls, symbol: str, wrapped_address: str, decimals: int) -> "Token":
+        return Token(token_address=symbol, symbol=symbol, decimals=decimals, listed=True, wrapped_token_address=wrapped_address)
 
     @classmethod
     def from_tuple(cls, t: Tuple) -> "Token":

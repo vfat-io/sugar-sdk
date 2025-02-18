@@ -60,8 +60,9 @@ class Chain:
 @patch
 @require_context
 async def get_all_tokens(self: Chain, listed_only: bool = True) -> List[Token]:
+    native = Token.make_native_token(self.settings.native_token_symbol, self.settings.wrapped_native_token_addr, self.settings.native_token_decimals)
     tokens = list(map(lambda t: Token.from_tuple(t), await self.sugar.functions.tokens(self.settings.pagination_limit, 0, ADDRESS_ZERO, []).call()))
-    return list(filter(lambda t: t.listed, tokens)) if listed_only else tokens
+    return [native] + (list(filter(lambda t: t.listed, tokens)) if listed_only else tokens)
    
 
 # %% ../src/chains.ipynb 9
@@ -87,7 +88,7 @@ async def get_pools(self: Chain) -> List[LiquidityPool]:
 @patch
 async def _get_prices(self: Chain, tokens: Tuple[Token]):
     prices = await self.prices.functions.getManyRatesWithCustomConnectors(
-        list(map(lambda t: t.token_address, tokens)),
+        list(map(lambda t: t.wrapped_token_address or t.token_address, tokens)),
         self.settings.stable_token_addr,
         False, # use wrappers
         self.settings.connector_tokens_addrs,

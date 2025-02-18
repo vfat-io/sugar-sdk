@@ -56,5 +56,7 @@ d = { 'settings': { 'branch': 'main',
                              'sugar.price.Price.pretty_price': ('price.html#price.pretty_price', 'sugar/price.py')},
             'sugar.token': { 'sugar.token.Token': ('token.html#token', 'sugar/token.py'),
                              'sugar.token.Token.from_tuple': ('token.html#token.from_tuple', 'sugar/token.py'),
+                             'sugar.token.Token.is_native': ('token.html#token.is_native', 'sugar/token.py'),
+                             'sugar.token.Token.make_native_token': ('token.html#token.make_native_token', 'sugar/token.py'),
                              'sugar.token.Token.value_from_bigint': ('token.html#token.value_from_bigint', 'sugar/token.py')},
             'sugar.web3': {}}}

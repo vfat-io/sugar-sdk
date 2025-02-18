@@ -15,7 +15,9 @@ base_default_settings = {
   "price_batch_size": int(os.getenv("SUGAR_PRICE_BATCH_SIZE","40")),
   "price_threshold_filter": int(os.getenv("SUGAR_PRICE_THRESHOLD_FILTER","10")),
   "pagination_limit": int(os.getenv("SUGAR_PAGINATION_LIMIT","2000")),
-  "pool_page_size": int(os.getenv("SUGAR_POOL_PAGE_SIZE","500"))
+  "pool_page_size": int(os.getenv("SUGAR_POOL_PAGE_SIZE","500")),
+  "native_token_symbol": "ETH",
+  "native_token_decimals": 18
 }
 
 
@@ -24,6 +26,7 @@ class ChainSettings:
     # chain IDs come from: https://chainlist.org/
     chain_id: str
     chain_name: str
+    wrapped_native_token_addr: str
     rpc_uri: str
     sugar_contract_addr: str
     price_oracle_contract_addr: str
@@ -35,6 +38,8 @@ class ChainSettings:
     price_threshold_filter: int
     pagination_limit: int
     pool_page_size: int
+    native_token_symbol: str
+    native_token_decimals: int
 
     def __str__(self):
         # go over all attributes of self
@@ -72,6 +77,7 @@ def make_settings(chain_id: str, chain_name: str, **kwargs) -> ChainSettings:
 def make_op_chain_settings(**kwargs) -> ChainSettings:
     d = {
         "rpc_uri": "https://optimism-mainnet.wallet.coinbase.com",
+        "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "sugar_contract_addr": "0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2",
         "price_oracle_contract_addr": "0x59114D308C6DE4A84F5F8cD80485a5481047b99f",
         "router_contract_addr": "0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858",
@@ -85,6 +91,7 @@ def make_op_chain_settings(**kwargs) -> ChainSettings:
 def make_base_chain_settings(**kwargs) -> ChainSettings:
     d = {
         "rpc_uri": "https://mainnet.base.org",
+        "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "sugar_contract_addr": "0x92294D631E995f1dd9CeE4097426e6a71aB87Bcf",
         "price_oracle_contract_addr": "0x3B06c787711ecb5624cE65AC8F26cde10831eb0C",
         "router_contract_addr": "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43",
