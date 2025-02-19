@@ -118,9 +118,10 @@ async def get_prices(self: Chain, tokens: List[Token]) -> List[Price]:
 # %% ../src/chains.ipynb 13
 @patch
 @require_context
-async def sign_and_send_tx(self: Chain, tx, wait: bool = True):
+async def sign_and_send_tx(self: Chain, tx, value: int = 0, wait: bool = True):
+    print(f"sign_and_send_tx: {tx} with value: {value}")
     spender = self.account.address
-    tx = await tx.build_transaction({ 'from': spender, 'nonce': await self.web3.eth.get_transaction_count(spender) })
+    tx = await tx.build_transaction({ 'from': spender, 'value': value, 'nonce': await self.web3.eth.get_transaction_count(spender) })
     signed_tx = self.account.sign_transaction(tx)
     tx_hash = await self.web3.eth.send_raw_transaction(signed_tx.raw_transaction)
     return await self.web3.eth.wait_for_transaction_receipt(tx_hash) if wait else tx_hash
@@ -183,6 +184,34 @@ async def deposit(self: Chain, deposit: Deposit, delay_in_minutes: float = 30, s
     print(f"allowances: {token0_allowance}, {token1_allowance}")
 
     # adding liquidity
+
+    # if token 0 is native, use addLiquidityETH instead of standard addLiquidity
+    if pool.token0.token_address == self.settings.wrapped_native_token_addr:
+        params = [
+            pool.token1.token_address,
+            pool.is_stable,
+            token1_amount,
+            apply_slippage(token1_amount, slippage),
+            apply_slippage(token0_amount, slippage),
+            self.account.address,
+            get_future_timestamp(delay_in_minutes)
+        ]
+        print(f"adding liquidity with params: {params}")
+        return await self.sign_and_send_tx(self.router.functions.addLiquidityETH(*params), value=token0_amount)
+    
+    # token 1 is native, use addLiquidityETH instead of standard addLiquidity
+    if pool.token1.token_address == self.settings.wrapped_native_token_addr:
+        params = [
+            pool.token0.token_address,
+            pool.is_stable,
+            token0_amount,
+            apply_slippage(token0_amount, slippage),
+            apply_slippage(token1_amount, slippage),
+            self.account.address,
+            get_future_timestamp(delay_in_minutes)
+        ]
+        print(f"adding liquidity with params: {params}")
+        return await self.sign_and_send_tx(self.router.functions.addLiquidityETH(*params), value=token1_amount)
 
     params = [
         pool.token0.token_address,
