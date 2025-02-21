@@ -68,6 +68,8 @@ class LiquidityPool:
     factory: str
     symbol: str
     is_stable: bool
+    # concentrated liquidity pools
+    is_cl: bool
     total_supply: float
     decimals: int
     token0: Token
@@ -88,14 +90,13 @@ class LiquidityPool:
     def from_tuple(
         cls, t: Tuple, tokens: Dict[str, Token] #,prices: Dict[str, Price]
     ) -> Optional["LiquidityPool"]:
-        token0 = normalize_address(t[7])
-        token1 = normalize_address(t[10])
-        token0_fees = t[23]
-        token1_fees = t[24]
+        token0, token1, pool_type = normalize_address(t[7]), normalize_address(t[10]), t[4]
+        # token0_fees = t[23]
+        # token1_fees = t[24]
         emissions_token = normalize_address(t[20])
-        emissions = t[19]
+        # emissions = t[19]
 
-        seconds_in_a_week = 7 * 24 * 60 * 60
+        # seconds_in_a_week = 7 * 24 * 60 * 60
 
         # Sugar.all returns a tuple with the following structure:
         # { "name": "lp", "type": "address" },          <== 0
@@ -127,15 +128,16 @@ class LiquidityPool:
         # { "name": "alm", "type": "address" }             <== 26
 
         token0, token1 = tokens.get(token0), tokens.get(token1)
-
         if not token0 or not token1: return None
-
+        symbol = f"CL{pool_type}-{token0.symbol}/{token1.symbol}" if pool_type > 0  else f"{'s' if pool_type == 0 else 'v'}AMM-{token0.symbol}/{token1.symbol}"
+    
         return LiquidityPool(
             lp=normalize_address(t[0]),
             factory=normalize_address(t[18]),
-            symbol=t[1],
+            symbol=symbol,
             # stable pools have type set to 0
-            is_stable=t[4] == 0,
+            is_stable=pool_type == 0,
+            is_cl=pool_type > 0,
             total_supply=t[3],
             decimals=t[2],
             token0=token0,
