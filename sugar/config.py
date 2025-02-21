@@ -29,6 +29,10 @@ class ChainSettings:
     wrapped_native_token_addr: str
     rpc_uri: str
     sugar_contract_addr: str
+    # slipstream operates on concentrated liquidity (CL) pools
+    slipstream_contract_addr: str
+    # Non-Fungible Position Manager for CL pools
+    nfpm_contract_addr: str
     price_oracle_contract_addr: str
     router_contract_addr: str
     token_addr: str
@@ -79,6 +83,8 @@ def make_op_chain_settings(**kwargs) -> ChainSettings:
         "rpc_uri": "https://optimism-mainnet.wallet.coinbase.com",
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "sugar_contract_addr": "0x3B919747B46B13CFfd9f16629cFf951C0b7ea1e2",
+        "slipstream_contract_addr": "0xD45624bf2CB9f65ecbdF3067d21992b099b56202",
+        "nfpm_contract_addr": "0x416b433906b1B72FA758e166e239c43d68dC6F29",
         "price_oracle_contract_addr": "0x59114D308C6DE4A84F5F8cD80485a5481047b99f",
         "router_contract_addr": "0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858",
         "token_addr": "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db",
@@ -93,6 +99,8 @@ def make_base_chain_settings(**kwargs) -> ChainSettings:
         "rpc_uri": "https://mainnet.base.org",
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "sugar_contract_addr": "0x92294D631E995f1dd9CeE4097426e6a71aB87Bcf",
+        "slipstream_contract_addr": "0x0AD09A66af0154a84e86F761313d02d0abB6edd5",
+        "nfpm_contract_addr": "0x827922686190790b37229fd06084350E74485b72",
         "price_oracle_contract_addr": "0x3B06c787711ecb5624cE65AC8F26cde10831eb0C",
         "router_contract_addr": "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43",
         "token_addr": "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db",

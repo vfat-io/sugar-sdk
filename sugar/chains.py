@@ -12,7 +12,7 @@ from web3 import AsyncWeb3, AsyncHTTPProvider, Account
 from web3.eth.async_eth import AsyncContract
 from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings
 from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp
-from .abi import sugar, price_oracle, router
+from .abi import sugar, slipstream, price_oracle, router
 from .token import Token
 from .pool import LiquidityPool
 from .price import Price
@@ -46,6 +46,7 @@ class Chain:
         self._in_context = True
         self.web3 = AsyncWeb3(AsyncHTTPProvider(self.settings.rpc_uri))
         self.sugar = self.web3.eth.contract(address=self.settings.sugar_contract_addr, abi=sugar)
+        self.slipstream = self.web3.eth.contract(address=self.settings.slipstream_contract_addr, abi=slipstream)
         self.prices = self.web3.eth.contract(address=self.settings.price_oracle_contract_addr, abi=price_oracle)
         self.router = self.web3.eth.contract(address=self.settings.router_contract_addr, abi=router)
         return self
