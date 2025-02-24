@@ -73,8 +73,7 @@ async def get_pools(self: Chain) -> List[LiquidityPool]:
     pools, offset, limit = [], 0, self.settings.pool_page_size
     tokens = await self.get_all_tokens()
     prices = await self.get_prices(tokens)
-    tokens = {t.token_address: t for t in tokens}
-    prices = {price.token.token_address: price for price in prices}
+    tokens, prices = {t.token_address: t for t in tokens}, {price.token.token_address: price for price in prices}
 
     while True:
         pools_batch = await self.sugar.functions.all(limit, offset).call()
@@ -82,7 +81,7 @@ async def get_pools(self: Chain) -> List[LiquidityPool]:
         if len(pools_batch) < limit: break
         else: offset += limit
 
-    return list(filter(lambda p: p is not None, map(lambda p: LiquidityPool.from_tuple(p, tokens), pools)))
+    return list(filter(lambda p: p is not None, map(lambda p: LiquidityPool.from_tuple(p, tokens, prices), pools)))
 
 # %% ../src/chains.ipynb 11
 # @cache_in_seconds(ORACLE_PRICES_CACHE_MINUTES * 60)
@@ -95,7 +94,8 @@ async def _get_prices(self: Chain, tokens: Tuple[Token]):
         self.settings.connector_tokens_addrs,
         10 # threshold_filer
     ).call()
-    # 6 decimals for USDC
+    # XX: decimals are auto set to 18, see
+    # https://github.com/velodrome-finance/oracle/blob/main/contracts/VeloOracle.sol#L126
     return [Price(token=tokens[cnt], price=price / 10**6) for cnt, price in enumerate(prices)]
 
 @patch

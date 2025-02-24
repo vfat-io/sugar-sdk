@@ -29,9 +29,42 @@ async with BaseChain() as chain:
     print(await chain.get_prices(aero))
 ```
 
-    [Price(token=Token(token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True), price=0.875957)]
+    [Price(token=Token(token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True, wrapped_token_address=None), price=0.751632)]
 
 ## OP quickstart
+
+``` python
+from sugar.chains import OPChain
+
+async with OPChain() as chain:
+    aero = [t for t in await chain.get_all_tokens() if t.symbol == 'VELO']
+    print(await chain.get_prices(aero))
+```
+
+    [Price(token=Token(token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True, wrapped_token_address=None), price=0.070759)]
+
+## Pools
+
+``` python
+from sugar.chains import OPChain
+
+async with OPChain() as chain:
+    pools = await chain.get_pools()
+    usdc_velo = next(iter([p for p in pools if p.token0.token_address == OPChain.usdc and p.token1.token_address == OPChain.velo]), None)
+    print(f"{usdc_velo.symbol}")
+    print("-----------------------")
+    print(f"Volume: {usdc_velo.token0_volume} {usdc_velo.token0.symbol} | {usdc_velo.token1_volume} {usdc_velo.token1.symbol} | ${usdc_velo.volume}")
+    print(f"Fees: {usdc_velo.token0_fees.amount} {usdc_velo.token0.symbol} | {usdc_velo.token1_fees.amount} {usdc_velo.token1.symbol} | ${usdc_velo.total_fees}")
+    print(f"TVL: {usdc_velo.reserve0.amount} {usdc_velo.token0.symbol} | {usdc_velo.reserve1.amount} {usdc_velo.token1.symbol} | ${usdc_velo.tvl}")
+    print(f"APR: {usdc_velo.apr}%")
+```
+
+    vAMM-USDC/VELO
+    -----------------------
+    Volume: 392074.14166666666 USDC | 5283835.856344064 VELO | $766000.6375484233
+    Fees: 3528.667275 USDC | 47554.52270709657 VELO | $6894.0057379358095
+    TVL: 2419532.615429 USDC | 34205901.12937684 VELO | $4840215.82655274
+    APR: 30.371775556785447%
 
 ## Deposits
 
@@ -63,6 +96,8 @@ Full list of configuration parameters for Sugar. Chain IDs can be found
 | wrapped_native_token_addr | `SUGAR_WRAPPED_NATIVE_TOKEN_ADDR_<CHAIN_ID>` | chain specific |
 | rpc_uri | `SUGAR_RPC_URI_<CHAIN_ID>` | chain specific |
 | sugar_contract_addr | `SUGAR_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
+| slipstream_contract_addr | `SUGAR_SLIPSTREAM_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
+| nfpm_contract_addr | `SUGAR_NFPM_CONTRACT_ADDR` | chain specific |
 | price_oracle_contract_addr | `SUGAR_PRICE_ORACLE_ADDR_<CHAIN_ID>` | chain specific |
 | router_contract_addr | `SUGAR_ROUTER_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
 | token_addr | `SUGAR_TOKEN_ADDR_<CHAIN_ID>` | chain specific |

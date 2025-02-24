@@ -32,27 +32,14 @@ class Amount:
     price: "Price"
 
     @classmethod
-    def build(
-        cls,
-        address: str,
-        amount: float,
-        tokens: Dict[str, Token],
-        prices: Dict[str, "Price"],
-    ) -> "Amount":
+    def build(cls, address: str, amount: float, tokens: Dict[str, Token], prices: Dict[str, "Price"]) -> "Amount":
         address = normalize_address(address)
-
-        if address not in tokens or address not in prices:
-            return None
-
+        if address not in tokens or address not in prices: return None
         token = tokens[address]
-
-        return Amount(
-            token=token, amount=token.value_from_bigint(amount), price=prices[address]
-        )
+        return Amount(token=token, amount=token.value_from_bigint(amount), price=prices[address])
 
     @property
-    def amount_in_stable(self) -> float:
-        return self.amount * self.price.price
+    def amount_in_stable(self) -> float: return self.amount * self.price.price
 
 
 # %% ../src/pool.ipynb 6
@@ -73,30 +60,70 @@ class LiquidityPool:
     total_supply: float
     decimals: int
     token0: Token
-    #reserve0: Amount
+    reserve0: Amount
     token1: Token
-    #reserve1: Amount
-    #token0_fees: Amount
-    #token1_fees: Amount
+    reserve1: Amount
+    token0_fees: Amount
+    token1_fees: Amount
     pool_fee: float
     gauge_total_supply: float
-    #emissions: Amount
+    emissions: Amount
     emissions_token: Token
-    #weekly_emissions: Amount
+    weekly_emissions: Amount
     nfpm: str
     alm: str
 
+    @property
+    def tvl(self) -> float: return self.reserve0.amount_in_stable + self.reserve1.amount_in_stable
+
+    @property
+    def total_fees(self) -> float:
+        result = 0
+
+        if self.token0_fees: result += self.token0_fees.amount_in_stable
+        if self.token1_fees: result += self.token1_fees.amount_in_stable
+
+        return result
+
+    @property
+    def pool_fee_percentage(self) -> float: return self.pool_fee / 100
+
+    @property
+    def volume_pct(self) -> float: return 100 / self.pool_fee_percentage
+
+    @property
+    def volume(self) -> Amount:
+        t0 = self.token0_fees.amount_in_stable if self.token0_fees else 0
+        t1 = self.token1_fees.amount_in_stable if self.token1_fees else 0
+        return self.volume_pct * (t0 + t1)
+
+    @property
+    def token0_volume(self) -> float: return self.token0_fees.amount * self.volume_pct if self.token0_fees else 0
+
+    @property
+    def token1_volume(self) -> float: return self.token1_fees.amount * self.volume_pct if self.token1_fees else 0
+
+    @property
+    def apr(self) -> float:
+        day_seconds, tvl = 24 * 60 * 60, self.tvl
+        reward_value = self.emissions.amount_in_stable if self.emissions else 0
+        reward = reward_value * day_seconds
+        staked_pct = (
+            100 * self.gauge_total_supply / self.total_supply if self.total_supply != 0 else 0
+        )
+        staked_tvl = tvl * staked_pct / 100
+        return (reward / staked_tvl) * (100 * 365) if staked_tvl != 0 else 0
+
     @classmethod
     def from_tuple(
-        cls, t: Tuple, tokens: Dict[str, Token] #,prices: Dict[str, Price]
+        cls, t: Tuple, tokens: Dict[str, Token], prices: Dict[str, Price]
     ) -> Optional["LiquidityPool"]:
         token0, token1, pool_type = normalize_address(t[7]), normalize_address(t[10]), t[4]
-        # token0_fees = t[23]
-        # token1_fees = t[24]
+        token0_fees, token1_fees = t[23], t[24]
         emissions_token = normalize_address(t[20])
-        # emissions = t[19]
+        emissions = t[19]
 
-        # seconds_in_a_week = 7 * 24 * 60 * 60
+        seconds_in_a_week = 7 * 24 * 60 * 60
 
         # Sugar.all returns a tuple with the following structure:
         # { "name": "lp", "type": "address" },          <== 0
@@ -141,18 +168,16 @@ class LiquidityPool:
             total_supply=t[3],
             decimals=t[2],
             token0=token0,
-            #reserve0=Amount.build(token0, t[8], tokens, prices),
+            reserve0=Amount.build(token0.token_address, t[8], tokens, prices),
             token1=token1,
-            #reserve1=Amount.build(token1, t[11], tokens, prices),
-            #token0_fees=Amount.build(token0, token0_fees, tokens, prices),
-            #token1_fees=Amount.build(token1, token1_fees, tokens, prices),
+            reserve1=Amount.build(token1.token_address, t[11], tokens, prices),
+            token0_fees=Amount.build(token0.token_address, token0_fees, tokens, prices),
+            token1_fees=Amount.build(token1.token_address, token1_fees, tokens, prices),
             pool_fee=t[21],
             gauge_total_supply=t[14],
             emissions_token=tokens.get(emissions_token),
-            #emissions=Amount.build(emissions_token, emissions, tokens, prices),
-            # weekly_emissions=Amount.build(
-            #     emissions_token, emissions * seconds_in_a_week, tokens, prices
-            # ),
+            emissions=Amount.build(emissions_token, emissions, tokens, prices),
+            weekly_emissions=Amount.build(emissions_token, emissions * seconds_in_a_week, tokens, prices),
             nfpm=normalize_address(t[25]),
             alm=normalize_address(t[26]),
         )
