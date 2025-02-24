@@ -6,7 +6,7 @@ __all__ = ['T', 'require_context', 'Chain', 'OPChain', 'BaseChain', 'OPChainSimn
 # %% ../src/chains.ipynb 3
 import asyncio, web3, os
 from functools import wraps, reduce
-from typing import List, TypeVar, Callable, Optional, Tuple
+from typing import List, TypeVar, Callable, Optional, Tuple, Dict
 from fastcore.utils import patch
 from web3 import AsyncWeb3, AsyncHTTPProvider, Account
 from web3.eth.async_eth import AsyncContract
@@ -86,34 +86,49 @@ async def get_pools(self: Chain) -> List[LiquidityPool]:
 # %% ../src/chains.ipynb 11
 # @cache_in_seconds(ORACLE_PRICES_CACHE_MINUTES * 60)
 @patch
-async def _get_prices(self: Chain, tokens: Tuple[Token]):
-    prices = await self.prices.functions.getManyRatesWithCustomConnectors(
+async def _get_prices(self: Chain, tokens: Tuple[Token]) -> List[Dict[str, int]]:
+    # token_address => normalized rate
+    result = {}
+    rates = await self.prices.functions.getManyRatesToEthWithCustomConnectors(
         list(map(lambda t: t.wrapped_token_address or t.token_address, tokens)),
-        self.settings.stable_token_addr,
         False, # use wrappers
         self.settings.connector_tokens_addrs,
         10 # threshold_filer
     ).call()
-    # USDC is 6 decimals
-    return [Price(token=tokens[cnt], price=price / 10**6) for cnt, price in enumerate(prices)]
+
+    # rates are returned multiplied by eth decimals + the difference in decimals to eth
+    # we want them all normalized to 18 decimals
+    for cnt, rate in enumerate(rates):
+        t, eth_decimals = tokens[cnt], self.settings.native_token_decimals
+        if t.decimals == eth_decimals: nr = rate
+        elif t.decimals < eth_decimals: nr = rate // (10 ** (eth_decimals - t.decimals))
+        else: nr = rate * (10 ** (t.decimals - eth_decimals))
+        result[t.token_address] = nr
+
+    return result
+
 
 @patch
 @require_context
 async def get_prices(self: Chain, tokens: List[Token]) -> List[Price]:
     """Get prices for tokens in target stable token"""
-    # filter out stable token from tokens list so getManyRatesWithCustomConnectors does not freak out
-    tokens_without_stable = list(filter(lambda t: t.token_address != self.settings.stable_token_addr, tokens))
-    stable = next(filter(lambda t: t.token_address == self.settings.stable_token_addr, tokens), None)
+
+    eth_decimals = self.settings.native_token_decimals
 
     batches = await asyncio.gather(
         *map(
             # XX: lists are not cacheable, convert them to tuples so lru cache is happy
             lambda ts: self._get_prices(tuple(ts)),
-            list(chunk(tokens_without_stable, self.settings.price_batch_size)),
+            list(chunk(tokens, self.settings.price_batch_size)),
         )
     )
-    return ([Price(token=stable, price=1)] if stable else []) + reduce(lambda l1, l2: l1 + l2, batches, [])
-
+    # all rates in EHT: token => rate
+    rates_in_eth = reduce(lambda a, b: a | b, batches)
+    eth_rate, usd_rate = rates_in_eth[self.settings.native_token_symbol], rates_in_eth[self.settings.stable_token_addr]
+    # this gives us the price of 1 eth in usd with 18 decimals precision
+    eth_usd_price = (eth_rate * 10 ** eth_decimals) // usd_rate
+    # finally convert to prices in terms of stable
+    return [Price(token=t, price=(rates_in_eth[t.token_address] * eth_usd_price // 10 ** eth_decimals) / 10 ** eth_decimals) for t in tokens]
 
 # %% ../src/chains.ipynb 13
 @patch
@@ -231,7 +246,7 @@ async def deposit(self: Chain, deposit: Deposit, delay_in_minutes: float = 30, s
 
 # %% ../src/chains.ipynb 19
 class OPChain(Chain):
-    usdc: str = normalize_address("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
+    usdc: str = normalize_address("0x7f5c764cbc14f9669b88837ca1490cca17c31607")
     velo: str = normalize_address("0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db")
 
     def __init__(self, **kwargs): super().__init__(make_op_chain_settings(**kwargs))
