@@ -94,15 +94,14 @@ async def _get_prices(self: Chain, tokens: Tuple[Token]):
         self.settings.connector_tokens_addrs,
         10 # threshold_filer
     ).call()
-    # XX: decimals are auto set to 18, see
-    # https://github.com/velodrome-finance/oracle/blob/main/contracts/VeloOracle.sol#L126
+    # USDC is 6 decimals
     return [Price(token=tokens[cnt], price=price / 10**6) for cnt, price in enumerate(prices)]
 
 @patch
 @require_context
 async def get_prices(self: Chain, tokens: List[Token]) -> List[Price]:
     """Get prices for tokens in target stable token"""
-    # filter out stable token from tokens list so getManyRatesWithCustomConnectors so does not freak out
+    # filter out stable token from tokens list so getManyRatesWithCustomConnectors does not freak out
     tokens_without_stable = list(filter(lambda t: t.token_address != self.settings.stable_token_addr, tokens))
     stable = next(filter(lambda t: t.token_address == self.settings.stable_token_addr, tokens), None)
 
