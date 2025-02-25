@@ -246,7 +246,7 @@ async def deposit(self: Chain, deposit: Deposit, delay_in_minutes: float = 30, s
 
 # %% ../src/chains.ipynb 19
 class OPChain(Chain):
-    usdc: str = normalize_address("0x7f5c764cbc14f9669b88837ca1490cca17c31607")
+    usdc: str = normalize_address("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
     velo: str = normalize_address("0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db")
 
     def __init__(self, **kwargs): super().__init__(make_op_chain_settings(**kwargs))
