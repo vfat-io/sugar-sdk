@@ -11,15 +11,9 @@ pip install git+https://github.com/velodrome-finance/sugar-sdk
 
 **TODO**: push to pypi
 
-``` python
-# load env
-from dotenv import load_dotenv
-load_dotenv()
-```
-
-    True
-
 ## Base quickstart
+
+Getting start with Sugar on Base network:
 
 ``` python
 from sugar.chains import BaseChain, AsyncBaseChain
@@ -36,18 +30,9 @@ with BaseChain() as chain:
         print(f"{p.token.symbol} price: {p.price}")
 ```
 
-    ETH price: 2493.730879871026
-    tBTC price: 89224.39116374683
-    USDbC price: 1.0017660536011292
-    WETH price: 2493.730879871026
-    T price: 0.017866263433246897
-    ETH price: 2493.740797040875
-    tBTC price: 89224.74599491524
-    USDbC price: 1.0017697172914204
-    WETH price: 2493.740797040875
-    T price: 0.01786632641861627
-
 ## OP quickstart
+
+Getting started with Sugar on OP network:
 
 ``` python
 from sugar.chains import AsyncOPChain, OPChain
@@ -62,25 +47,16 @@ with OPChain() as chain:
         print(f"{p.token.symbol} price: {p.price}")
 ```
 
-    ETH price: 2553.3386872068204
-    VELO price: 0.06543596476209321
-    RED price: 0.12055408976396115
-    USDC price: 1.0
-    WETH price: 2553.3386872068204
-    ETH price: 2553.3386872068204
-    VELO price: 0.06543596476209321
-    RED price: 0.12055408976396115
-    USDC price: 1.0
-    WETH price: 2553.3386872068204
-
 ## Pools
+
+Getting information about pools:
 
 ``` python
 from sugar.chains import AsyncOPChain, OPChain
 
 async with AsyncOPChain() as chain:
     pools = await chain.get_pools()
-    usdc_velo = next(iter([p for p in pools if p.token0.token_address == OPChain.usdc and p.token1.token_address == OPChain.velo]), None)
+    usdc_velo = next(iter([p for p in pools if p.token0.token_address == OPChain.usdc.token_address and p.token1.token_address == OPChain.velo.token_address]), None)
     print(f"{usdc_velo.symbol}")
     print("-----------------------")
     print(f"Volume: {usdc_velo.token0_volume} {usdc_velo.token0.symbol} | {usdc_velo.token1_volume} {usdc_velo.token1.symbol} | ${usdc_velo.volume}")
@@ -90,7 +66,7 @@ async with AsyncOPChain() as chain:
 
 with OPChain() as chain:
     pools = chain.get_pools()
-    usdc_velo = next(iter([p for p in pools if p.token0.token_address == OPChain.usdc and p.token1.token_address == OPChain.velo]), None)
+    usdc_velo = next(iter([p for p in pools if p.token0.token_address == OPChain.usdc.token_address and p.token1.token_address == OPChain.velo.token_address]), None)
     print(f"{usdc_velo.symbol}")
     print("-----------------------")
     print(f"Volume: {usdc_velo.token0_volume} {usdc_velo.token0.symbol} | {usdc_velo.token1_volume} {usdc_velo.token1.symbol} | ${usdc_velo.volume}")
@@ -99,35 +75,31 @@ with OPChain() as chain:
     print(f"APR: {usdc_velo.apr}%")
 ```
 
-    vAMM-USDC/VELO
-    -----------------------
-    Volume: 756749.1011111111 USDC | 13151147.940511389 VELO | $1637676.1540950162
-    Fees: 6810.74191 USDC | 118360.3314646025 VELO | $14739.085386855146
-    TVL: 2286090.488682 USDC | 35949447.85712064 VELO | $4700011.161312506
-    APR: 28.920762224848183%
-    vAMM-USDC/VELO
-    -----------------------
-    Volume: 756749.1011111111 USDC | 13151147.940511389 VELO | $1637675.781948628
-    Fees: 6810.74191 USDC | 118360.3314646025 VELO | $14739.082037537652
-    TVL: 2286090.488682 USDC | 35949447.85712064 VELO | $4700010.093279505
-    APR: 28.92076222484818%
+## Swaps
 
-## Deposits - WIP
-
-In order to deposit, make sure spender’s account’s private key is
-provided via `SUGAR_PK` env var. Here’s how you can deposit
-[vAMM-USDC/AERO](https://aerodrome.finance/deposit?token0=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&token1=0x940181a94A35A4569E4529A3CDfB74e38FD98631&type=-1)
+Get a quote and swap:
 
 ``` python
-from sugar.chains import AsyncBaseChain
-from sugar.deposit import Deposit
+from sugar.chains import AsyncOPChain
 
-async with AsyncBaseChain() as chain:
-    pools = await chain.get_pools()
-    pools = list(filter(lambda x: "vAMM-USDC" in x.symbol and "AERO" in x.symbol, pools))
-    # 0.02 USDC 
-    await chain.deposit(Deposit(pools[0], 0.02))
+async with AsyncOPChain() as chain:
+    quote = await op.get_quote(from_token=AsyncOPChain.velo, to_token=AsyncOPChain.eth, amount=10)
+    # check on quote to see if you are OK with the amount
+    await op.swap_from_quote(quote)
 ```
+
+“I am Feeling lucky” swap:
+
+``` python
+from sugar.chains import AsyncOPChain
+
+async with AsyncOPChain() as chain:
+    await op.swap(from_token=velo, to_token=eth, amount=10)
+```
+
+> **NOTE**: amount you pass into quote/swap should be a float indicating
+> decimal amount of input token **NOT** amount in wei. Sugar runs
+> conversion for you behind the scenes
 
 ## Configuration
 
@@ -146,9 +118,12 @@ Full list of configuration parameters for Sugar. Chain IDs can be found
 | nfpm_contract_addr | `SUGAR_NFPM_CONTRACT_ADDR` | chain specific |
 | price_oracle_contract_addr | `SUGAR_PRICE_ORACLE_ADDR_<CHAIN_ID>` | chain specific |
 | router_contract_addr | `SUGAR_ROUTER_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
+| swapper_contract_addr | `SUGAR_ROUTER_SWAPPER_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
+| swap_slippage | `SUGAR_SWAP_SLIPPAGE_<CHAIN_ID>` | 0.01 |
 | token_addr | `SUGAR_TOKEN_ADDR_<CHAIN_ID>` | chain specific |
 | stable_token_addr | `SUGAR_STABLE_TOKEN_ADDR_<CHAIN_ID>` | chain specific |
 | connector_tokens_addrs | `SUGAR_CONNECTOR_TOKENS_ADDRS_<CHAIN_ID>` | chain specific |
+| excluded_tokens_addrs | `SUGAR_EXCLUDED_TOKENS_ADDRS_<CHAIN_ID>` | chain specific |
 | price_batch_size | `SUGAR_PRICE_BATCH_SIZE` | 40 |
 | price_threshold_filter | `SUGAR_PRICE_THRESHOLD_FILTER` | 10 |
 | pool_page_size | `SUGAR_POOL_PAGE_SIZE` | 500 |
@@ -190,3 +165,10 @@ pip install -e '.[dev]'
 ``` bash
 pre-commit install
 ```
+
+### Regenerate ABIs if needed
+
+ABIs for contracts are stored inside `sugar/abis` dir. To regenerate
+them, use `abis.py` script (make sure you have `ETHERSCAN_API_KEY` env
+var set). We use [Optimistic
+Etherscan](https://optimistic.etherscan.io/).
