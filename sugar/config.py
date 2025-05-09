@@ -19,6 +19,7 @@ base_default_settings = {
   "native_token_symbol": "ETH",
   "native_token_decimals": 18,
   "swap_slippage": 0.01,
+  "pricing_cache_timeout_seconds": 5
 }
 
 
@@ -52,6 +53,8 @@ class ChainSettings:
     pool_page_size: int
     native_token_symbol: str
     native_token_decimals: int
+    # how often to check for new prices
+    pricing_cache_timeout_seconds: int
 
     def __str__(self):
         # go over all attributes of self
@@ -71,7 +74,7 @@ class ChainSettings:
 def validate_settings(settings: ChainSettings) -> ChainSettings:
     # TODO: this should actually validate stuff, duh
     floats = ["swap_slippage"]
-    ints = ["price_batch_size", "price_threshold_filter", "pagination_limit", "pool_page_size", "native_token_decimals"]
+    ints = ["price_batch_size", "price_threshold_filter", "pagination_limit", "pool_page_size", "native_token_decimals", "pricing_cache_timeout_seconds"]
     for k in floats: setattr(settings, k, float(getattr(settings, k)))
     for k in ints: setattr(settings, k, int(getattr(settings, k)))
     return settings

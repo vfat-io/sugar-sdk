@@ -10,6 +10,8 @@ from web3 import Web3, constants
 from typing import List, Tuple
 from decimal import Decimal
 from datetime import datetime, timedelta
+from dataclasses import dataclass
+import networkx as nx
 import math
 
 # %% ../src/helpers.ipynb 3
@@ -17,13 +19,6 @@ def normalize_address(address: str) -> str: return Web3.to_checksum_address(addr
 
 ADDRESS_ZERO = constants.ADDRESS_ZERO
 MAX_UINT256 = Web3.to_int(hexstr='0x' + 'f' * 64)
-
-# def is_address(value: str) -> bool:
-#     return Web3.is_address(value)
-
-
-# def cache_in_seconds(seconds: int):
-#     return alru_cache(ttl=seconds)
 
 def chunk(list_to_chunk: List, n: int):
     for i in range(0, len(list_to_chunk), n):
@@ -71,9 +66,6 @@ def apply_slippage(amount: int, slippage: float) -> int:
 
 # %% ../src/helpers.ipynb 12
 # Claude 3.7 sonnet made this
-
-from dataclasses import dataclass
-import networkx as nx
 
 @dataclass
 class Pair: token0: str; token1: str; pool: str

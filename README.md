@@ -13,7 +13,7 @@ pip install git+https://github.com/velodrome-finance/sugar-sdk
 
 ## Base quickstart
 
-Getting start with Sugar on Base network:
+Getting started with Sugar on Base network:
 
 ``` python
 from sugar.chains import BaseChain, AsyncBaseChain
@@ -128,6 +128,7 @@ Full list of configuration parameters for Sugar. Chain IDs can be found
 | price_threshold_filter | `SUGAR_PRICE_THRESHOLD_FILTER` | 10 |
 | pool_page_size | `SUGAR_POOL_PAGE_SIZE` | 500 |
 | pagination_limit | `SUGAR_PAGINATION_LIMIT` | 2000 |
+| pricing_cache_timeout_seconds | `SUGAR_PRICING_CACHE_TIMEOUT_SECONDS_<CHAIN_ID>` | 5 |
 
 In order to write to Sugar contracts, you need to set your wallet
 private key using env var `SUGAR_PK`
@@ -175,6 +176,5 @@ Etherscan](https://optimistic.etherscan.io/).
 
 ## Useful links
 
-- keep an eye on the latest sugar contract deployment for your favorite
-  chain
-  [here](https://github.com/velodrome-finance/sugar/tree/main/deployments)
+- keep an eye on the latest sugar contract deployment for your favorite chain [here](https://github.com/velodrome-finance/sugar/tree/main/deployments)
+
