@@ -16,6 +16,8 @@ base_default_settings = {
   "price_threshold_filter": int(os.getenv("SUGAR_PRICE_THRESHOLD_FILTER","10")),
   "pagination_limit": int(os.getenv("SUGAR_PAGINATION_LIMIT","2000")),
   "pool_page_size": int(os.getenv("SUGAR_POOL_PAGE_SIZE","500")),
+  # XX: dealing with Schrödinger's paginator this is likely to be ignore in the future with new sugar helpers
+  "pools_count_upper_bound": 2500,
   "native_token_symbol": "ETH",
   "native_token_decimals": 18,
   "swap_slippage": 0.01,
@@ -31,6 +33,7 @@ class ChainSettings:
     wrapped_native_token_addr: str
     rpc_uri: str
     sugar_contract_addr: str
+    sugar_rewards_contract_addr: str
     # slipstream operates on concentrated liquidity (CL) pools
     slipstream_contract_addr: str
     # Non-Fungible Position Manager for CL pools
@@ -50,6 +53,7 @@ class ChainSettings:
     price_batch_size: int
     price_threshold_filter: int
     pagination_limit: int
+    pools_count_upper_bound: int
     pool_page_size: int
     native_token_symbol: str
     native_token_decimals: int
@@ -74,7 +78,7 @@ class ChainSettings:
 def validate_settings(settings: ChainSettings) -> ChainSettings:
     # TODO: this should actually validate stuff, duh
     floats = ["swap_slippage"]
-    ints = ["price_batch_size", "price_threshold_filter", "pagination_limit", "pool_page_size", "native_token_decimals", "pricing_cache_timeout_seconds"]
+    ints = ["price_batch_size", "price_threshold_filter", "pagination_limit", "pool_page_size", "native_token_decimals", "pricing_cache_timeout_seconds", "pools_count_upper_bound"]
     for k in floats: setattr(settings, k, float(getattr(settings, k)))
     for k in ints: setattr(settings, k, int(getattr(settings, k)))
     return settings
@@ -111,6 +115,7 @@ def make_op_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettings
         "rpc_uri": "https://optimism-mainnet.wallet.coinbase.com",
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "sugar_contract_addr": "0xA64db2D254f07977609def75c3A7db3eDc72EE1D",
+        "sugar_rewards_contract_addr": "0x62CCFB2496f49A80B0184AD720379B529E9152fB",
         "slipstream_contract_addr": "0xD45624bf2CB9f65ecbdF3067d21992b099b56202",
         "nfpm_contract_addr": "0x416b433906b1B72FA758e166e239c43d68dC6F29",
         "price_oracle_contract_addr": "0x59114D308C6DE4A84F5F8cD80485a5481047b99f",
@@ -130,6 +135,7 @@ def make_base_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "rpc_uri": "https://mainnet.base.org",
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "sugar_contract_addr": "0x6F8Ea68A1a66e49e16A470bcF6fe2A3a7b94CDe9",
+        "sugar_rewards_contract_addr": "0xA44600F4DBA6683d8BD99270B1A6a143fB9F1C3B",
         "slipstream_contract_addr": "0x0AD09A66af0154a84e86F761313d02d0abB6edd5",
         "nfpm_contract_addr": "0x827922686190790b37229fd06084350E74485b72",
         "price_oracle_contract_addr": "0x3B06c787711ecb5624cE65AC8F26cde10831eb0C",
