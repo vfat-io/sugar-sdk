@@ -6,7 +6,7 @@
 ## Using Sugar
 
 ``` bash
-pip install git+https://github.com/velodrome-finance/sugar-sdk
+pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.0
 ```
 
 **TODO**: push to pypi
