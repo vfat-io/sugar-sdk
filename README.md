@@ -6,10 +6,11 @@
 ## Using Sugar
 
 ``` bash
-pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.0
+pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.1
 ```
 
-**TODO**: push to pypi
+You can take it for a spin on
+[CodeSandbox](https://codesandbox.io/p/sandbox/sugar-sdk-playground-7c4z7g)
 
 ## Base quickstart
 
@@ -203,4 +204,6 @@ Etherscan](https://optimistic.etherscan.io/).
 
 ## Useful links
 
-- keep an eye on the latest sugar contract deployment for your favorite chain [here](https://github.com/velodrome-finance/sugar/tree/main/deployments)
+- keep an eye on the latest sugar contract deployment for your favorite
+  chain
+  [here](https://github.com/velodrome-finance/sugar/tree/main/deployments)
