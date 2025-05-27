@@ -6,7 +6,7 @@
 ## Using Sugar
 
 ``` bash
-pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.1
+pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.2
 ```
 
 You can take it for a spin on
