@@ -21,7 +21,7 @@ Sugar makes Velodrome and Aerodrome devs life sweeter 🍭
 ## Using Sugar
 
 ``` bash
-pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.2
+pip install git+https://github.com/velodrome-finance/sugar-sdk.git@v0.2.3
 ```
 
 You can take it for a spin on
