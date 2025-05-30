@@ -6,7 +6,8 @@ __all__ = ['original_format_batched_response', 'T', 'safe_format_batched_respons
            'AsyncBaseChain', 'BaseChain']
 
 # %% ../src/chains.ipynb 3
-import os
+import os, asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import wraps, lru_cache
 from async_lru import alru_cache
 from cachetools import cached, TTLCache
@@ -17,7 +18,7 @@ from web3.eth import Contract
 from web3.manager import RequestManager, RequestBatcher
 from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings
 from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp, ADDRESS_ZERO, chunk, Pair
-from .helpers import find_all_paths
+from .helpers import find_all_paths, time_it, atime_it
 from .abi import get_abi
 from .token import Token
 from .pool import LiquidityPool, LiquidityPoolForSwap, LiquidityPoolEpoch
@@ -152,25 +153,9 @@ class CommonChain:
         # filter out paths with excluded tokens
         return list(filter(lambda p: len(set(map(lambda t: t[0], p)) & exclude_tokens_set) == 0, paths))
 
-    def get_pool_paginator(self):
+    def get_pool_paginator(self, batch_size = 5) -> List[List[Tuple]]:
         limit, upper_bound = self.settings.pool_page_size, self.settings.pools_count_upper_bound
-        return list(map(lambda x: (x, limit), list(range(0, upper_bound, limit))))
-
-    def prepare_epoch_batcher(self, batch: RequestBatcher):
-        pagination_batches = self.get_pool_paginator()
-        for offset, limit in pagination_batches: batch.add(self.sugar_rewards.functions.epochsLatest(limit, offset))
-        return batch
-    
-    def prepare_pool_batcher(self, batch: RequestBatcher, for_swaps: bool = False):
-        pagination_batches = self.get_pool_paginator()
-        f = self.sugar.functions.all if not for_swaps else self.sugar.functions.forSwaps
-        for offset, limit in pagination_batches: batch.add(f(limit, offset))
-        return batch
-    
-    def prepare_token_batcher(self, batch: RequestBatcher):
-        pagination_batches = self.get_pool_paginator()
-        for offset, limit in pagination_batches: batch.add(self.sugar.functions.tokens(limit, offset, ADDRESS_ZERO, []))
-        return batch
+        return chunk(list(map(lambda x: (x, limit), list(range(0, upper_bound, limit)))), batch_size)
     
     def prepare_price_batcher(self, tokens: List[Token], batch: RequestBatcher):
         batches = chunk(tokens, self.settings.price_batch_size)
@@ -181,8 +166,7 @@ class CommonChain:
                 self.settings.connector_tokens_addrs,
                 10 # threshold_filter
             ))
-        return batch
-            
+        return batch        
 
 # %% ../src/chains.ipynb 8
 class AsyncChain(CommonChain):
@@ -218,14 +202,19 @@ class AsyncChain(CommonChain):
         await self.web3.provider.disconnect()
         return None
 
+    async def apaginate(self, f: Callable):
+        async def process_batch(batch: List[Tuple]):
+            async with self.web3.batch_requests() as batcher:
+                for offset, limit in batch: batcher.add(f(limit, offset))
+                return sum(await batcher.async_execute(), [])
+        return sum(await asyncio.gather(*[process_batch(batch) for batch in self.get_pool_paginator()]), [])
+
     @require_async_context
     @alru_cache(maxsize=None)
     async def get_all_tokens(self, listed_only: bool = False) -> List[Token]:
-        async with self.web3.batch_requests() as batch:
-            batch = self.prepare_token_batcher(batch)
-            # batches_of_tokens <- list of lists, flatten it below
-            return self.prepare_tokens(sum(await batch.async_execute(), []), listed_only)
-    
+        def get_tokens(limit, offset): return self.sugar.functions.tokens(limit, offset, ADDRESS_ZERO, [])
+        return self.prepare_tokens(await self.apaginate(get_tokens), listed_only)
+
     async def _get_prices(self, tokens: Tuple[Token]):
         async with self.web3.batch_requests() as batch:
             batch = self.prepare_price_batcher(tokens=list(tokens), batch=batch)
@@ -238,10 +227,7 @@ class AsyncChain(CommonChain):
 
     @alru_cache(maxsize=None)
     async def get_raw_pools(self, for_swaps: bool):
-        async with self.web3.batch_requests() as batch:
-            batch = self.prepare_pool_batcher(batch, for_swaps)
-            # batches_of_pools <- list of lists, flatten it below
-            return sum(await batch.async_execute(), [])
+        return await self.apaginate(self.sugar.functions.forSwaps if for_swaps else self.sugar.functions.all)
     
     @require_async_context
     async def get_pools(self, for_swaps: bool = False) -> List[LiquidityPool]:
@@ -273,11 +259,7 @@ class AsyncChain(CommonChain):
     async def get_latest_pool_epochs(self) -> List[LiquidityPoolEpoch]:
         tokens, pools = await self.get_all_tokens(listed_only=False), await self.get_pools()
         prices = await self.get_prices(tokens)
-        async with self.web3.batch_requests() as batch:
-            batch = self.prepare_epoch_batcher(batch)
-            batches_of_epochs = await batch.async_execute()
-            # batches_of_epochs <- list of lists, flatten it below
-            return self.prepare_pool_epochs(sum(batches_of_epochs, []), pools, tokens, prices)
+        return self.prepare_pool_epochs(await self.apaginate(self.sugar_rewards.functions.epochsLatest), pools, tokens, prices)
     
     @require_async_context
     async def get_pools_for_swaps(self) -> List[LiquidityPoolForSwap]: return await self.get_pools(for_swaps=True)
@@ -291,16 +273,11 @@ class AsyncChain(CommonChain):
 
     @require_async_context
     async def get_quote(self, from_token: Token, to_token: Token, amount: float, filter_quotes: Optional[Callable[[Quote], bool]] = None) -> Optional[Quote]:
-        amount_in = amount
+        amount_in = float_to_uint256(amount, decimals=from_token.decimals)
         pools = self.filter_pools_for_swap(from_token=from_token, to_token=to_token, pools=await self.get_pools_for_swaps())
         paths = self.get_paths_for_quote(from_token, to_token, pools, self.settings.excluded_tokens_addrs)
-        # TODO: investigate why this takes too long
-        # quotes = sum(await asyncio.gather(*[self._get_quotes_for_paths(from_token, to_token, amount_in, pools, paths) for paths in chunk(paths, 500)]), [])
-        quotes = [] 
-        for paths in chunk(paths, 500):
-            r = await self._get_quotes_for_paths(from_token, to_token, float_to_uint256(amount_in, decimals=from_token.decimals), pools, paths)
-            for q in r:
-                if q is not None: quotes.append(q)
+        quotes = sum(await asyncio.gather(*[self._get_quotes_for_paths(from_token, to_token, amount_in, pools, paths) for paths in chunk(paths, 500)]), [])
+        quotes = list(filter(lambda q: q is not None, quotes))
         if filter_quotes is not None: quotes = list(filter(filter_quotes, quotes))
         return max(quotes, key=lambda q: q.amount_out) if len(quotes) > 0 else None
     
@@ -448,6 +425,29 @@ class Chain(CommonChain):
         self._in_context = False
         return None
     
+    def paginate(self, f: Callable):
+        results, batches = [], self.get_pool_paginator()
+
+        def process_batch(batch: List[Tuple]):
+            with self.web3.batch_requests() as batcher:
+                for offset, limit in batch: batcher.add(f(limit, offset))
+                return sum(batcher.execute(), [])
+
+        
+        with ThreadPoolExecutor(max_workers=self.settings.threading_max_workers) as executor:
+            future_to_batch = {
+                executor.submit(process_batch, batch): batch
+                for batch in batches
+            }
+            for future in as_completed(future_to_batch):
+                try: results.extend(future.result())
+                except Exception as e:
+                    print(f"Error processing path chunk: {e}")
+                    continue
+
+        return results
+
+
     @require_context
     def sign_and_send_tx(self, tx, value: int = 0, wait: bool = True):
         spender = self.account.address
@@ -464,10 +464,8 @@ class Chain(CommonChain):
     @require_context
     @lru_cache(maxsize=None)
     def get_all_tokens(self, listed_only: bool = False) -> List[Token]:
-        with self.web3.batch_requests() as batch:
-            batch = self.prepare_token_batcher(batch)
-            # batches_of_tokens <- list of lists, flatten it below
-            return self.prepare_tokens(sum(batch.execute(), []), listed_only)
+        def get_tokens(limit, offset): return self.sugar.functions.tokens(limit, offset, ADDRESS_ZERO, [])
+        return self.prepare_tokens(self.paginate(get_tokens), listed_only)
     
     def _get_prices(self, tokens: Tuple[Token]) -> List[int]:
         # token_address => normalized rate
@@ -482,10 +480,7 @@ class Chain(CommonChain):
     
     @lru_cache(maxsize=None)
     def get_raw_pools(self, for_swaps: bool):
-        with self.web3.batch_requests() as batch:
-            batch = self.prepare_pool_batcher(batch, for_swaps)
-            # batches_of_pools <- list of lists, flatten it below
-            return sum(batch.execute(), [])
+        return self.paginate(self.sugar.functions.forSwaps if for_swaps else self.sugar.functions.all)
 
     @require_context
     def get_pools(self, for_swaps: bool = False) -> List[LiquidityPool]:
@@ -520,11 +515,7 @@ class Chain(CommonChain):
     def get_latest_pool_epochs(self) -> List[LiquidityPoolEpoch]:
         tokens, pools = self.get_all_tokens(listed_only=False), self.get_pools()
         prices = self.get_prices(tokens)
-        with self.web3.batch_requests() as batch:
-            batch = self.prepare_epoch_batcher(batch)
-            batches_of_epochs = batch.execute()
-            # batches_of_epochs <- list of lists, flatten it below
-            return self.prepare_pool_epochs(sum(batches_of_epochs, []), pools, tokens, prices)
+        return self.prepare_pool_epochs(self.paginate(self.sugar_rewards.functions.epochsLatest), pools, tokens, prices)
 
     @require_context
     def _get_quotes_for_paths(self, from_token: Token, to_token: Token, amount_in: int, pools: List[LiquidityPoolForSwap], paths: List[List[Tuple]]) -> List[Optional[Quote]]:
@@ -532,21 +523,38 @@ class Chain(CommonChain):
         with self.web3.batch_requests() as batch:
             batch, inputs = self.prepare_quote_batch(from_token, to_token, batch, path_pools, amount_in, paths)
             return self.prepare_quotes(inputs, batch.execute())
-
+    
     @require_context
     def get_quote(self, from_token: Token, to_token: Token, amount: float, filter_quotes: Optional[Callable[[Quote], bool]] = None) -> Optional[Quote]:
-        amount_in = amount
+        amount_in = float_to_uint256(amount, decimals=from_token.decimals)
         pools = self.filter_pools_for_swap(from_token=from_token, to_token=to_token, pools=self.get_pools_for_swaps())
         paths = self.get_paths_for_quote(from_token, to_token, pools, self.settings.excluded_tokens_addrs)
-        path_chunks, chain_instance = list(chunk(paths, 500)), self
-        def get_quotes_for_chunk(paths_chunk): return chain_instance._get_quotes_for_paths(from_token, to_token, float_to_uint256(amount_in, decimals=from_token.decimals), pools, paths_chunk)
-        # TODO: make this work in threads re: https://github.com/ethereum/web3.py/issues/3613
-        all_quotes = []
-        for pc in path_chunks:
-            quotes = get_quotes_for_chunk(pc)
-            for q in quotes: all_quotes.append(q)
+        path_chunks = list(chunk(paths, 500))
 
-        if filter_quotes is not None: all_quotes = list(filter(filter_quotes, all_quotes))
+        def get_quotes_for_chunk(paths_chunk):
+            return self._get_quotes_for_paths(from_token, to_token, amount_in, pools, paths_chunk)
+        
+        all_quotes = []
+        
+        with ThreadPoolExecutor(max_workers=self.settings.threading_max_workers) as executor:
+            # Submit all chunk processing tasks
+            future_to_chunk = {
+                executor.submit(get_quotes_for_chunk, chunk_paths): chunk_paths 
+                for chunk_paths in path_chunks
+            }
+            
+            # Collect results as they complete
+            for future in as_completed(future_to_chunk):
+                try:
+                    all_quotes.extend(future.result())
+                except Exception as e:
+                    print(f"Error processing path chunk: {e}")
+                    continue
+
+        # Filter out None quotes
+        all_quotes = [q for q in all_quotes if q is not None]
+    
+        if filter_quotes is not None:  all_quotes = list(filter(filter_quotes, all_quotes))
 
         return max(all_quotes, key=lambda q: q.amount_out) if len(all_quotes) > 0 else None
     
