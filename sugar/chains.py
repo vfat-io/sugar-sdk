@@ -58,6 +58,12 @@ class CommonChain:
     @property
     def account(self) -> Account: return self.web3.eth.account.from_key(os.getenv("SUGAR_PK"))
 
+    @property
+    def id(self) -> str: return self.settings.chain_id
+
+    @property
+    def name(self) -> str: return self.settings.chain_name
+
     pools: Optional[List[LiquidityPool]] = None
     pools_for_swap: Optional[List[LiquidityPoolForSwap]] = None
 
@@ -78,8 +84,12 @@ class CommonChain:
         return contract_wrapper(address=token.wrapped_token_address or token.token_address, abi=ERC20_ABI)
     
     def prepare_tokens(self, tokens: List[Tuple], listed_only: bool) -> List[Token]:
-        native = Token.make_native_token(self.settings.native_token_symbol, self.settings.wrapped_native_token_addr, self.settings.native_token_decimals)
-        ts = list(map(lambda t: Token.from_tuple(t), tokens))
+        native = Token.make_native_token(self.settings.native_token_symbol,
+                                         self.settings.wrapped_native_token_addr,
+                                         self.settings.native_token_decimals,
+                                         chain_id=self.id,
+                                         chain_name=self.name)
+        ts = list(map(lambda t: Token.from_tuple(t, chain_id=self.id, chain_name=self.name), tokens))
         return [native] + (list(filter(lambda t: t.listed, ts)) if listed_only else ts)
     
     def _prepare_prices(self, tokens: List[Token], rates: List[int]) -> Dict[str, int]:
@@ -108,10 +118,10 @@ class CommonChain:
     
     def prepare_pools(self, pools: List[Tuple], tokens: List[Token], prices: List[Price]) -> List[LiquidityPool]:
         tokens, prices = {t.token_address: t for t in tokens}, {price.token.token_address: price for price in prices}
-        return list(filter(lambda p: p is not None, map(lambda p: LiquidityPool.from_tuple(p, tokens, prices), pools)))
+        return list(filter(lambda p: p is not None, map(lambda p: LiquidityPool.from_tuple(p, tokens, prices, chain_id=self.id, chain_name=self.name), pools)))
     
     def prepare_pools_for_swap(self, pools: List[Tuple]) -> List[LiquidityPoolForSwap]:
-        return list(map(lambda p: LiquidityPoolForSwap.from_tuple(p), pools))
+        return list(map(lambda p: LiquidityPoolForSwap.from_tuple(p, chain_id=self.id, chain_name=self.name), pools))
 
     def prepare_pool_epochs(self, epochs: List[Tuple], pools: List[LiquidityPool], tokens: List[Token], prices: List[Price]) -> List[LiquidityPoolEpoch]:
         tokens, prices, pools = {t.token_address: t for t in tokens}, {price.token.token_address: price for price in prices}, {p.lp: p for p in pools}
@@ -573,10 +583,16 @@ class Chain(CommonChain):
         return self.sign_and_send_tx(self.swapper.functions.execute(*[planner.commands, planner.inputs]), value=value)
 
 # %% ../src/chains.ipynb 12
+_op_settings = make_op_chain_settings()
+
 class OPChainCommon():
-    usdc: Token = Token(token_address='0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85', symbol='USDC', decimals=6, listed=True, wrapped_token_address=None)
-    velo: Token = Token(token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True, wrapped_token_address=None)
-    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
+    usdc: Token = Token(chain_id=_op_settings.chain_id, chain_name=_op_settings.chain_name,
+                        token_address='0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85', symbol='USDC',
+                        decimals=6, listed=True, wrapped_token_address=None)
+    velo: Token = Token(chain_id=_op_settings.chain_id, chain_name=_op_settings.chain_name,
+                        token_address='0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db', symbol='VELO', decimals=18, listed=True, wrapped_token_address=None)
+    eth: Token = Token(chain_id=_op_settings.chain_id, chain_name=_op_settings.chain_name,
+                       token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncOPChain(AsyncChain, OPChainCommon):
     def __init__(self, **kwargs): super().__init__(make_op_chain_settings(**kwargs), **kwargs)
@@ -586,10 +602,15 @@ class OPChain(Chain, OPChainCommon):
 
 
 # %% ../src/chains.ipynb 14
+_base_settings = make_base_chain_settings()
+
 class BaseChainCommon():
-    usdc: Token = Token(token_address='0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', symbol='USDC', decimals=6, listed=True, wrapped_token_address=None)
-    aero: Token = Token(token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True, wrapped_token_address=None)
-    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
+    usdc: Token = Token(chain_id=_base_settings.chain_id, chain_name=_base_settings.chain_name,
+                        token_address='0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', symbol='USDC', decimals=6, listed=True, wrapped_token_address=None)
+    aero: Token = Token(chain_id=_base_settings.chain_id, chain_name=_base_settings.chain_name,
+                        token_address='0x940181a94A35A4569E4529A3CDfB74e38FD98631', symbol='AERO', decimals=18, listed=True, wrapped_token_address=None)
+    eth: Token = Token(chain_id=_base_settings.chain_id, chain_name=_base_settings.chain_name,
+                       token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncBaseChain(AsyncChain, BaseChainCommon):
     def __init__(self, **kwargs): super().__init__(make_base_chain_settings(**kwargs), **kwargs)
