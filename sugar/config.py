@@ -16,6 +16,7 @@ base_default_settings = {
   "price_threshold_filter": int(os.getenv("SUGAR_PRICE_THRESHOLD_FILTER","10")),
   "pagination_limit": int(os.getenv("SUGAR_PAGINATION_LIMIT","2000")),
   "pool_page_size": int(os.getenv("SUGAR_POOL_PAGE_SIZE","500")),
+  "interchain_account_router_contract_addr" : normalize_address("0x0bc8e181c04428301309dd1abff804c0ecf6b5a8"),
   # XX: dealing with Schrödinger's paginator this is likely to be ignored in the future with new sugar helpers
   "pools_count_upper_bound": 2500,
   "native_token_symbol": "ETH",
@@ -44,6 +45,8 @@ class ChainSettings:
     quoter_contract_addr: str
     # aka Universal Router
     swapper_contract_addr: str
+    # interchain (superswaps, baby) account router contract address
+    interchain_account_router_contract_addr: str
     token_addr: str
     stable_token_addr: str
     connector_tokens_addrs: List[str]

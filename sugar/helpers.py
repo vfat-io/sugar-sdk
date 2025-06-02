@@ -3,16 +3,16 @@
 # %% auto 0
 __all__ = ['ADDRESS_ZERO', 'MAX_UINT256', 'normalize_address', 'chunk', 'amount_to_k_string', 'format_currency',
            'format_percentage', 'amount_to_m_string', 'float_to_uint256', 'get_future_timestamp', 'apply_slippage',
-           'Pair', 'find_all_paths', 'Timer', 'time_it', 'atime_it']
+           'parse_ether', 'Pair', 'find_all_paths', 'Timer', 'time_it', 'atime_it']
 
 # %% ../src/helpers.ipynb 2
 from web3 import Web3, constants
 from typing import List, Tuple, Optional, Callable
-from decimal import Decimal
+from decimal import Decimal, getcontext
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 import networkx as nx
-import math, time, asyncio
+import math, time, asyncio, decimal
 from contextlib import contextmanager, asynccontextmanager
 
 # %% ../src/helpers.ipynb 3
@@ -65,7 +65,25 @@ def apply_slippage(amount: int, slippage: float) -> int:
     if slippage < 0 or slippage > 1: raise ValueError("Slippage must be between 0 and 1")
     return int(math.ceil(amount * (1 - slippage)))
 
-# %% ../src/helpers.ipynb 12
+# %% ../src/helpers.ipynb 9
+def parse_ether(ether: str) -> int:
+    # Set precision high enough to handle 18 decimal places
+    getcontext().prec = 50
+    
+    try:
+        # Convert to Decimal for precise arithmetic
+        ether_decimal = Decimal(str(ether))
+        
+        # Convert to wei (multiply by 10^18)
+        wei_decimal = ether_decimal * Decimal('1000000000000000000')
+        
+        # Convert to integer
+        return int(wei_decimal)
+    
+    except (ValueError, TypeError, decimal.InvalidOperation) as e:
+        raise ValueError(f"Invalid ether value: {ether}") from e
+
+# %% ../src/helpers.ipynb 14
 # Claude 3.7 sonnet made this
 
 @dataclass
@@ -123,7 +141,7 @@ def find_all_paths(pairs: List[Pair], start_token: str, end_token: str, cutoff=3
     return uniques
 
 
-# %% ../src/helpers.ipynb 15
+# %% ../src/helpers.ipynb 17
 # Claude 4 sonnet made this
 
 class Timer:

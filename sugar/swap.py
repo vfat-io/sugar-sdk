@@ -20,6 +20,10 @@ class CommandType(IntEnum):
     V2_SWAP_EXACT_OUT = 0x09
     WRAP_ETH = 0x0b
     UNWRAP_WETH = 0x0c
+    TRANSFER_FROM = 0x07
+    BRIDGE_TOKEN = 0x12
+    EXECUTE_CROSS_CHAIN = 0x13
+    EXECUTE_SUB_PLAN = 0x21
 
 # Define ABI types for each command
 ABI_DEFINITION = {
