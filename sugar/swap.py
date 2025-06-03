@@ -149,7 +149,7 @@ class RoutePlanner:
 # Constants
 CONTRACT_BALANCE_FOR_V3_SWAPS = int("0x8000000000000000000000000000000000000000000000000000000000000000", 16)
 
-def setup_planner(quote: Quote, slippage: float, account: str, router_address) -> RoutePlanner:
+def setup_planner(quote: Quote, slippage: float, account: str, router_address: str) -> RoutePlanner:
     """Setup route planner with the given quote and chain"""
     
     route_planner = RoutePlanner()

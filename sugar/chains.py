@@ -18,7 +18,7 @@ from web3.eth import Contract
 from web3.manager import RequestManager, RequestBatcher
 from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings
 from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp, ADDRESS_ZERO, chunk, Pair
-from .helpers import find_all_paths, time_it, atime_it
+from .helpers import find_all_paths, time_it, atime_it, parse_ether, to_bytes32, get_unique_str, OPEN_USDT_TOKEN
 from .abi import get_abi
 from .token import Token
 from .pool import LiquidityPool, LiquidityPoolForSwap, LiquidityPoolEpoch
@@ -200,6 +200,9 @@ class AsyncChain(CommonChain):
         self.router = self.web3.eth.contract(address=self.settings.router_contract_addr, abi=get_abi("router"))
         self.quoter = self.web3.eth.contract(address=self.settings.quoter_contract_addr, abi=get_abi("quoter"))
         self.swapper = self.web3.eth.contract(address=self.settings.swapper_contract_addr, abi=get_abi("swapper"))
+        if hasattr(self.settings, "interchain_account_addr"):
+            # TODO: clean this up when interchain jazz is fully implemented
+            self.ica_router = self.web3.eth.contract(address=self.settings.interchain_account_addr, abi=get_abi("interchain_account_router"))
 
         # set up caching for price oracle
         self._get_prices = alru_cache(ttl=self.settings.pricing_cache_timeout_seconds)(self._get_prices)
@@ -218,6 +221,94 @@ class AsyncChain(CommonChain):
                 for offset, limit in batch: batcher.add(f(limit, offset))
                 return sum(await batcher.async_execute(), [])
         return sum(await asyncio.gather(*[process_batch(batch) for batch in self.get_pool_paginator()]), [])
+    
+    @require_async_context
+    async def get_domain(self, chain_id: Optional[int] = None) -> int:
+        # TODO: remove chain_id arg when all chains support domains
+        # TODO: move this somewhere else
+        MESSAGE_MODULE_ADDRESS = normalize_address("0x2BbA7515F7cF114B45186274981888D8C2fBA15E")
+        domains_abi = [
+            {
+                "name": "domains",
+                "type": "function",
+                "stateMutability": "view",
+                "inputs": [
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "name": "domain",
+                        "type": "uint256"
+                    }
+                ]
+            }
+        ]
+        contract = self.web3.eth.contract(address=MESSAGE_MODULE_ADDRESS, abi=domains_abi)
+        domain = await contract.functions.domains(int(self.settings.chain_id) if not chain_id else chain_id).call()
+        # TODO: remove fallback to chain_id when all chains support domains
+        return domain if domain != 0 else int(chain_id if chain_id else self.settings.chain_id)
+    
+    @require_async_context
+    async def get_remote_interchain_account(self, destination_domain: int):
+        abi = [{
+            "name": "getRemoteInterchainAccount",
+            "type": "function",
+            "stateMutability": "view",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "uint32"
+                },
+                {
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "name": "",
+                    "type": "bytes32"
+                }
+            ],
+            "outputs": [
+                {
+                "name": "userICA",
+                "type": "address"
+                }
+            ]
+        }]
+        contract = self.web3.eth.contract(address=self.settings.interchain_account_addr, abi=abi)
+        return await contract.functions.getRemoteInterchainAccount(
+            destination_domain,
+            self.settings.swapper_contract_addr,
+            # always pass user address for consistency. Fallback condition here just to prevent runtime error
+            to_bytes32(self.account.address or ADDRESS_ZERO),
+        ).call()
+
+    @require_async_context
+    async def get_ica_hook(self): return await self.ica_router.functions.hook().call()
+
+    @require_async_context
+    async def get_user_ica_balance(self, user_ica: str) -> int:
+        abi = [{
+            "type": 'function',
+            "name": 'balanceOf',
+            "stateMutability": 'view',
+            "inputs": [
+                {
+                    "name": 'account',
+                    "type": 'address',
+                }
+            ],
+            "outputs": [
+                {
+                    "type": 'uint256',
+                }
+            ]
+        }]
+        contract = self.web3.eth.contract(address=OPEN_USDT_TOKEN, abi=abi)
+        return await contract.functions.balanceOf(user_ica).call()
 
     @require_async_context
     @alru_cache(maxsize=None)
