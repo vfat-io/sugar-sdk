@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['base_default_settings', 'GetEnv', 'ChainSettings', 'validate_settings', 'get_env', 'make_settings',
-           'make_op_chain_settings', 'make_base_chain_settings']
+           'make_op_chain_settings', 'make_base_chain_settings', 'make_uni_chain_settings']
 
 # %% ../src/config.ipynb 3
 import os
@@ -153,3 +153,25 @@ def make_base_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "excluded_tokens_addrs": "0x74ccbe53f77b08632ce0cb91d3a545bf6b8e0979,0x8901cb2e82cc95c01e42206f8d1f417fe53e7af0,0x9cbd543f1b1166b2df36b68eb6bb1dce24e6abdf,0x025f99977db78317a4eba606998258b502bb256f,0xd260115030b9fb6849da169a01ed80b6496d1e99,0x608d5401d377228e465ba6113517dcf9bd1f95ca,0xd260115030b9fB6849da169a01ed80b6496d1e99,0x728cDA34D732a87fD6429129e23D4742d9Ff0064,0x728cda34d732a87fd6429129e23d4742d9ff0064,0xAC1Bd2486aAf3B5C0fc3Fd868558b082a531B2B4,0x0f929C29dcE303F96b1d4104505F2e60eE795caC,0x47E78d664E6c339693e8638B7A7D9543AbCc99D4,0xFF0C532FDB8Cd566Ae169C1CB157ff2Bdc83E105,0x373504da48418c67e6fcd071f33cb0b3b47613c7,0x0f929c29dce303f96b1d4104505f2e60ee795cac,0x628c5Ba9B775DACEcd14E237130c537f497d1CC7"
     }
     return make_settings("8453", "Base", chain_settings=d, get_env=get_env, **kwargs)
+
+# %% ../src/config.ipynb 10
+def make_uni_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettings:
+    d = {
+        "rpc_uri": "https://unichain.drpc.org",
+        "pools_count_upper_bound": 20,
+        "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
+        "interchain_account_addr": "0x1174A4719FaF964AfE2179A404b4830EC0DCB8D5",
+        "sugar_contract_addr": "0x154c0F8331B0B4af1384A2dFa67AADCa5Fd92C20",
+        "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",
+        "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",
+        "nfpm_contract_addr": "0x991d5546C4B442B4c5fdc4c8B8b8d131DEB24702",
+        "price_oracle_contract_addr": "0xe58920a8c684CD3d6dCaC2a41b12998e4CB17EfE",
+        "router_contract_addr": "0x3a63171DD9BebF4D07BC782FECC7eb0b890C2A45",
+        "quoter_contract_addr": "0x2f7150B288ef1cc553207bD9fbd40D4e0e093B24",
+        "swapper_contract_addr": "0x6Df1c91424F79E40E33B1A48F0687B666bE71075",
+        "token_addr": "",
+        "stable_token_addr": "0x078d782b760474a361dda0af3839290b0ef57ad6",
+        "connector_tokens_addrs": "0x4200000000000000000000000000000000000006,0x078d782b760474a361dda0af3839290b0ef57ad6",
+        "excluded_tokens_addrs": ""
+    }
+    return make_settings("130", "Uni", chain_settings=d, get_env=get_env, **kwargs)
