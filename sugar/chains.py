@@ -392,6 +392,47 @@ class AsyncChain(CommonChain):
         print(f"adding liquidity with params: {params}")
 
         return await self.sign_and_send_tx(self.router.functions.addLiquidity(*params))
+    
+    @require_async_context
+    async def get_swap_calldata(self, from_token: Token, to_token: Token, amount: float, slippage: Optional[float] = None):
+        """Get swap calldata and contract address without executing the transaction"""
+        q = await self.get_quote(from_token, to_token, amount)
+        if not q: raise ValueError("No quotes found")
+        return await self.get_swap_calldata_from_quote(q, slippage=slippage)
+
+    @require_async_context
+    async def get_swap_calldata_from_quote(self, quote: Quote, slippage: Optional[float] = None):
+        """Get swap calldata and contract address from quote without executing the transaction"""
+        swapper_contract_addr, from_token = self.settings.swapper_contract_addr, quote.from_token
+        planner = setup_planner(
+            quote=quote, 
+            slippage=slippage if slippage is not None else self.settings.swap_slippage, 
+            account=self.account.address, 
+            router_address=swapper_contract_addr
+        )
+        
+        # Build the transaction without sending it
+        tx_function = self.swapper.functions.execute(*[planner.commands, planner.inputs])
+        value = quote.input.amount_in if from_token.wrapped_token_address else 0
+        
+        # Build transaction to get calldata
+        spender = self.account.address
+        tx = await tx_function.build_transaction({
+            'from': spender, 
+            'value': value, 
+            'nonce': await self.web3.eth.get_transaction_count(spender)
+        })
+        
+        return {
+            'to': swapper_contract_addr,
+            'data': tx['data'],
+            'value': value,
+            'calldata': tx['data'],
+            'contract_address': swapper_contract_addr,
+            'quote': quote,
+            'planner': planner
+        }
+
 
 # %% ../src/chains.ipynb 10
 class Chain(CommonChain):
@@ -571,6 +612,46 @@ class Chain(CommonChain):
         self.set_token_allowance(from_token, swapper_contract_addr, quote.input.amount_in)
         value = quote.input.amount_in if from_token.wrapped_token_address else 0
         return self.sign_and_send_tx(self.swapper.functions.execute(*[planner.commands, planner.inputs]), value=value)
+    
+    @require_context
+    def get_swap_calldata(self, from_token: Token, to_token: Token, amount: float, slippage: Optional[float] = None):
+        """Get swap calldata and contract address without executing the transaction"""
+        q = self.get_quote(from_token, to_token, amount)
+        if not q: raise ValueError("No quotes found")
+        return self.get_swap_calldata_from_quote(q, slippage=slippage)
+
+    @require_context
+    def get_swap_calldata_from_quote(self, quote: Quote, slippage: Optional[float] = None):
+        """Get swap calldata and contract address from quote without executing the transaction"""
+        swapper_contract_addr, from_token = self.settings.swapper_contract_addr, quote.from_token
+        planner = setup_planner(
+            quote=quote, 
+            slippage=slippage if slippage is not None else self.settings.swap_slippage, 
+            account=self.account.address, 
+            router_address=swapper_contract_addr
+        )
+        
+        # Build the transaction without sending it
+        tx_function = self.swapper.functions.execute(*[planner.commands, planner.inputs])
+        value = quote.input.amount_in if from_token.wrapped_token_address else 0
+        
+        # Build transaction to get calldata
+        spender = self.account.address
+        tx = tx_function.build_transaction({
+            'from': spender, 
+            'value': value, 
+            'nonce': self.web3.eth.get_transaction_count(spender)
+        })
+        
+        return {
+            'to': swapper_contract_addr,
+            'data': tx['data'],
+            'value': value,
+            'calldata': tx['data'],
+            'contract_address': swapper_contract_addr,
+            'quote': quote,
+            'planner': planner
+        }
 
 # %% ../src/chains.ipynb 12
 class OPChainCommon():
