@@ -169,9 +169,9 @@ def make_uni_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSetting
         "router_contract_addr": "0x3a63171DD9BebF4D07BC782FECC7eb0b890C2A45",
         "quoter_contract_addr": "0x2f7150B288ef1cc553207bD9fbd40D4e0e093B24",
         "swapper_contract_addr": "0x6Df1c91424F79E40E33B1A48F0687B666bE71075",
-        "token_addr": "",
+        "token_addr": "0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",
         "stable_token_addr": "0x078d782b760474a361dda0af3839290b0ef57ad6",
         "connector_tokens_addrs": "0x4200000000000000000000000000000000000006,0x078d782b760474a361dda0af3839290b0ef57ad6",
-        "excluded_tokens_addrs": ""
+        "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"
     }
     return make_settings("130", "Uni", chain_settings=d, get_env=get_env, **kwargs)
