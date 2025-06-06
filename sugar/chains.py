@@ -3,7 +3,8 @@
 # %% auto 0
 __all__ = ['original_format_batched_response', 'T', 'safe_format_batched_response', 'require_context', 'require_async_context',
            'CommonChain', 'AsyncChain', 'Chain', 'OPChainCommon', 'AsyncOPChain', 'OPChain', 'BaseChainCommon',
-           'AsyncBaseChain', 'BaseChain', 'UniChainCommon', 'AsyncUniChain', 'UniChain']
+           'AsyncBaseChain', 'BaseChain', 'UniChainCommon', 'AsyncUniChain', 'UniChain', 'SoneiumChainCommon',
+           'AsyncSoneiumChain']
 
 # %% ../src/chains.ipynb 3
 import os, asyncio
@@ -16,7 +17,7 @@ from web3 import Web3, HTTPProvider, AsyncWeb3, AsyncHTTPProvider, Account
 from web3.eth.async_eth import AsyncContract
 from web3.eth import Contract
 from web3.manager import RequestManager, RequestBatcher
-from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings
+from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings, make_soneium_chain_settings
 from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp, ADDRESS_ZERO, chunk, Pair
 from .helpers import find_all_paths, time_it, atime_it
 from .abi import get_abi
@@ -687,3 +688,13 @@ class AsyncUniChain(AsyncChain, UniChainCommon):
 
 class UniChain(Chain, UniChainCommon):
     def __init__(self, **kwargs): super().__init__(make_uni_chain_settings(**kwargs), **kwargs)
+
+# %% ../src/chains.ipynb 18
+class SoneiumChainCommon():
+    pass
+    
+class AsyncSoneiumChain(AsyncChain, SoneiumChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_soneium_chain_settings(**kwargs), **kwargs)
+
+class UniChain(Chain, SoneiumChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_soneium_chain_settings(**kwargs), **kwargs)
