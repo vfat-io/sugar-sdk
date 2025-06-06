@@ -194,7 +194,7 @@ def make_soneium_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSet
         "swapper_contract_addr": "0x652e53C6a4FE39B6B30426d9c96376a105C89A95",#??is it correct?
         "token_addr": "0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
         "stable_token_addr": "0xbA9986D2381edf1DA03B0B9c1f8b00dc4AacC369",#
-        "connector_tokens_addrs": "0x4200000000000000000000000000000000000006,0x078d782b760474a361dda0af3839290b0ef57ad6",#
+        "connector_tokens_addrs": "0x4200000000000000000000000000000000000006,0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
         "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"#random one
     }
     return make_settings("1868", "Soneium", chain_settings=d, get_env=get_env, **kwargs)
