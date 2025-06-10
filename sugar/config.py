@@ -4,7 +4,8 @@
 __all__ = ['base_default_settings', 'GetEnv', 'ChainSettings', 'validate_settings', 'get_env', 'make_settings',
            'make_op_chain_settings', 'make_base_chain_settings', 'make_uni_chain_settings',
            'make_soneium_chain_settings', 'make_fraxtal_chain_settings', 'make_ink_chain_settings',
-           'make_lisk_chain_settings', 'make_metal_chain_settings']
+           'make_lisk_chain_settings', 'make_metal_chain_settings', 'make_swell_chain_settings',
+           'make_mode_chain_settings']
 
 # %% ../src/config.ipynb 3
 import os
@@ -283,3 +284,45 @@ def make_metal_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSetti
         "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"#random one
     }
     return make_settings("1750", "Metal", chain_settings=d, get_env=get_env, **kwargs)
+
+# %% ../src/config.ipynb 22
+def make_swell_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettings:
+    d = {
+        "rpc_uri": "https://swell-mainnet.alt.technology",
+        "pools_count_upper_bound": 20,
+        "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
+        "sugar_contract_addr": "0x154c0F8331B0B4af1384A2dFa67AADCa5Fd92C20",#
+        "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",#
+        "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",#
+        "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
+        "price_oracle_contract_addr": "0xe58920a8c684CD3d6dCaC2a41b12998e4CB17EfE",#
+        "router_contract_addr": "0x3a63171dd9bebf4d07bc782fecc7eb0b890c2a45",#
+        "quoter_contract_addr": "0x2f7150B288ef1cc553207bD9fbd40D4e0e093B24",#
+        "swapper_contract_addr": "0x652e53C6a4FE39B6B30426d9c96376a105C89A95",#
+        "token_addr": "0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
+        "stable_token_addr": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",#
+        "connector_tokens_addrs": "0x4200000000000000000000000000000000000006,0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
+        "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"#random one
+    }
+    return make_settings("1923", "Swell", chain_settings=d, get_env=get_env, **kwargs)
+
+# %% ../src/config.ipynb 24
+def make_mode_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettings:
+    d = {
+        "rpc_uri": "https://mainnet.mode.network",
+        "pools_count_upper_bound": 20,
+        "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
+        "sugar_contract_addr": "0x6eA93e8d5059D4bd986F24a46546E930e0d0Fa82",#
+        "sugar_rewards_contract_addr": "0xD5d3ABAcB8CF075636792658EE0be8B03AF517B8",#
+        "slipstream_contract_addr": "0xD24a61656AB0d70994Ef5F42fE11AA95c0a1d329",#
+        "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
+        "price_oracle_contract_addr": "0xbAEe949B52cb503e39f1Df54Dcee778da59E11bc",#
+        "router_contract_addr": "0x3a63171dd9bebf4d07bc782fecc7eb0b890c2a45",#
+        "quoter_contract_addr": "0x2f7150B288ef1cc553207bD9fbd40D4e0e093B24",#
+        "swapper_contract_addr": "0x652e53C6a4FE39B6B30426d9c96376a105C89A95",#
+        "token_addr": "0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
+        "stable_token_addr": "0xd988097fb8612cc24eeC14542bC03424c656005f",#
+        "connector_tokens_addrs": "0x4200000000000000000000000000000000000006,0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
+        "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"#random one
+    }
+    return make_settings("34443", "Mode", chain_settings=d, get_env=get_env, **kwargs)

@@ -6,7 +6,8 @@ __all__ = ['original_format_batched_response', 'T', 'safe_format_batched_respons
            'AsyncBaseChain', 'BaseChain', 'UniChainCommon', 'AsyncUniChain', 'UniChain', 'SoneiumChainCommon',
            'AsyncSoneiumChain', 'SoneiumChain', 'FraxtalChainCommon', 'AsyncFraxtalChain', 'FraxtalChain',
            'InkChainCommon', 'AsyncInkChain', 'InkChain', 'LiskChainCommon', 'AsyncLiskChain', 'LiskChain',
-           'MetalChainCommon', 'AsyncMetalChain', 'MetalChain']
+           'MetalChainCommon', 'AsyncMetalChain', 'MetalChain', 'SwellChainCommon', 'AsyncSwellChain', 'SwellChain',
+           'ModeChainCommon', 'AsyncModeChain', 'ModeChain']
 
 # %% ../src/chains.ipynb 3
 import os, asyncio
@@ -19,7 +20,7 @@ from web3 import Web3, HTTPProvider, AsyncWeb3, AsyncHTTPProvider, Account
 from web3.eth.async_eth import AsyncContract
 from web3.eth import Contract
 from web3.manager import RequestManager, RequestBatcher
-from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings, make_soneium_chain_settings, make_fraxtal_chain_settings, make_ink_chain_settings, make_lisk_chain_settings, make_metal_chain_settings
+from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings, make_soneium_chain_settings, make_fraxtal_chain_settings, make_ink_chain_settings, make_lisk_chain_settings, make_metal_chain_settings, make_mode_chain_settings, make_swell_chain_settings
 from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp, ADDRESS_ZERO, chunk, Pair
 from .helpers import find_all_paths, time_it, atime_it
 from .abi import get_abi
@@ -740,3 +741,23 @@ class AsyncMetalChain(AsyncChain, MetalChainCommon):
 
 class MetalChain(Chain, MetalChainCommon):
     def __init__(self, **kwargs): super().__init__(make_metal_chain_settings(**kwargs), **kwargs)
+
+# %% ../src/chains.ipynb 28
+class SwellChainCommon():
+    pass
+    
+class AsyncSwellChain(AsyncChain, SwellChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_swell_chain_settings(**kwargs), **kwargs)
+
+class SwellChain(Chain, SwellChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_swell_chain_settings(**kwargs), **kwargs)
+
+# %% ../src/chains.ipynb 30
+class ModeChainCommon():
+    pass
+    
+class AsyncModeChain(AsyncChain, ModeChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_mode_chain_settings(**kwargs), **kwargs)
+
+class ModeChain(Chain, ModeChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_mode_chain_settings(**kwargs), **kwargs)
