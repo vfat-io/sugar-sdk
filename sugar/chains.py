@@ -684,7 +684,7 @@ class BaseChain(Chain, BaseChainCommon):
 
 # %% ../src/chains.ipynb 16
 class UniChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncUniChain(AsyncChain, UniChainCommon):
     def __init__(self, **kwargs): super().__init__(make_uni_chain_settings(**kwargs), **kwargs)
@@ -694,7 +694,7 @@ class UniChain(Chain, UniChainCommon):
 
 # %% ../src/chains.ipynb 18
 class SoneiumChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncSoneiumChain(AsyncChain, SoneiumChainCommon):
     def __init__(self, **kwargs): super().__init__(make_soneium_chain_settings(**kwargs), **kwargs)
@@ -704,7 +704,7 @@ class SoneiumChain(Chain, SoneiumChainCommon):
 
 # %% ../src/chains.ipynb 20
 class FraxtalChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0xFC00000000000000000000000000000000000006')
     
 class AsyncFraxtalChain(AsyncChain, FraxtalChainCommon):
     def __init__(self, **kwargs): super().__init__(make_fraxtal_chain_settings(**kwargs), **kwargs)
@@ -714,7 +714,7 @@ class FraxtalChain(Chain, FraxtalChainCommon):
 
 # %% ../src/chains.ipynb 22
 class InkChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncInkChain(AsyncChain, InkChainCommon):
     def __init__(self, **kwargs): super().__init__(make_ink_chain_settings(**kwargs), **kwargs)
@@ -724,7 +724,7 @@ class InkChain(Chain, InkChainCommon):
 
 # %% ../src/chains.ipynb 24
 class LiskChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncLiskChain(AsyncChain, LiskChainCommon):
     def __init__(self, **kwargs): super().__init__(make_lisk_chain_settings(**kwargs), **kwargs)
@@ -734,7 +734,7 @@ class LiskChain(Chain, LiskChainCommon):
 
 # %% ../src/chains.ipynb 26
 class MetalChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncMetalChain(AsyncChain, MetalChainCommon):
     def __init__(self, **kwargs): super().__init__(make_metal_chain_settings(**kwargs), **kwargs)
@@ -744,7 +744,7 @@ class MetalChain(Chain, MetalChainCommon):
 
 # %% ../src/chains.ipynb 28
 class SwellChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncSwellChain(AsyncChain, SwellChainCommon):
     def __init__(self, **kwargs): super().__init__(make_swell_chain_settings(**kwargs), **kwargs)
@@ -754,7 +754,7 @@ class SwellChain(Chain, SwellChainCommon):
 
 # %% ../src/chains.ipynb 30
 class ModeChainCommon():
-    pass
+    eth: Token = Token(token_address='ETH', symbol='ETH', decimals=18, listed=True, wrapped_token_address='0x4200000000000000000000000000000000000006')
     
 class AsyncModeChain(AsyncChain, ModeChainCommon):
     def __init__(self, **kwargs): super().__init__(make_mode_chain_settings(**kwargs), **kwargs)
