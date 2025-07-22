@@ -5,7 +5,7 @@ __all__ = ['base_default_settings', 'GetEnv', 'ChainSettings', 'validate_setting
            'make_op_chain_settings', 'make_base_chain_settings', 'make_uni_chain_settings',
            'make_soneium_chain_settings', 'make_fraxtal_chain_settings', 'make_ink_chain_settings',
            'make_lisk_chain_settings', 'make_metal_chain_settings', 'make_swell_chain_settings',
-           'make_mode_chain_settings']
+           'make_mode_chain_settings', 'make_celo_chain_settings']
 
 # %% ../src/config.ipynb 3
 import os
@@ -326,3 +326,24 @@ def make_mode_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"#random one
     }
     return make_settings("34443", "Mode", chain_settings=d, get_env=get_env, **kwargs)
+
+# %% ../src/config.ipynb 26
+def make_celo_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettings:
+    d = {
+        "rpc_uri": "https://forno.celo.org",
+        "pools_count_upper_bound": 20,
+        "wrapped_native_token_addr": "0x471EcE3750Da237f93B8E339c536989b8978a438",#
+        "sugar_contract_addr": "0x74f18F46d20750Cab0d3fE75Ca0395bdB8016fD1",#
+        "sugar_rewards_contract_addr": "0x2DCD9B33F0721000Dc1F8f84B804d4CFA23d7713",#
+        "slipstream_contract_addr": "0x928bb6c9097d5c9c1eb5e99e71e24e4d773f2be5",#
+        "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
+        "price_oracle_contract_addr": "0xbf6d753FC4a10Ec5191c56BB3DC1e414b7572327",#
+        "router_contract_addr": "0x3a63171dd9bebf4d07bc782fecc7eb0b890c2a45",#
+        "quoter_contract_addr": "0x2f7150B288ef1cc553207bD9fbd40D4e0e093B24",#
+        "swapper_contract_addr": "0x01D40099fCD87C018969B0e8D4aB1633Fb34763C",#
+        "token_addr": "0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",#
+        "stable_token_addr": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e",
+        "connector_tokens_addrs": "0x471EcE3750Da237f93B8E339c536989b8978a438,0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81",
+        "excluded_tokens_addrs": "0xE3Ae7873B76722Ba23b1EEEEE544a75eDe891a66"#random one
+    }
+    return make_settings("42220", "Celo", chain_settings=d, get_env=get_env, **kwargs)

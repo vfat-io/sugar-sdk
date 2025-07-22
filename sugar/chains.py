@@ -7,7 +7,7 @@ __all__ = ['original_format_batched_response', 'T', 'safe_format_batched_respons
            'AsyncSoneiumChain', 'SoneiumChain', 'FraxtalChainCommon', 'AsyncFraxtalChain', 'FraxtalChain',
            'InkChainCommon', 'AsyncInkChain', 'InkChain', 'LiskChainCommon', 'AsyncLiskChain', 'LiskChain',
            'MetalChainCommon', 'AsyncMetalChain', 'MetalChain', 'SwellChainCommon', 'AsyncSwellChain', 'SwellChain',
-           'ModeChainCommon', 'AsyncModeChain', 'ModeChain']
+           'ModeChainCommon', 'AsyncModeChain', 'ModeChain', 'CeloChainCommon', 'AsyncCeloChain', 'CeloChain']
 
 # %% ../src/chains.ipynb 3
 import os, asyncio
@@ -20,7 +20,7 @@ from web3 import Web3, HTTPProvider, AsyncWeb3, AsyncHTTPProvider, Account
 from web3.eth.async_eth import AsyncContract
 from web3.eth import Contract
 from web3.manager import RequestManager, RequestBatcher
-from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings, make_soneium_chain_settings, make_fraxtal_chain_settings, make_ink_chain_settings, make_lisk_chain_settings, make_metal_chain_settings, make_mode_chain_settings, make_swell_chain_settings
+from .config import ChainSettings, make_op_chain_settings, make_base_chain_settings, make_uni_chain_settings, make_soneium_chain_settings, make_fraxtal_chain_settings, make_ink_chain_settings, make_lisk_chain_settings, make_metal_chain_settings, make_mode_chain_settings, make_swell_chain_settings, make_celo_chain_settings
 from .helpers import normalize_address, MAX_UINT256, float_to_uint256, apply_slippage, get_future_timestamp, ADDRESS_ZERO, chunk, Pair
 from .helpers import find_all_paths, time_it, atime_it
 from .abi import get_abi
@@ -761,3 +761,13 @@ class AsyncModeChain(AsyncChain, ModeChainCommon):
 
 class ModeChain(Chain, ModeChainCommon):
     def __init__(self, **kwargs): super().__init__(make_mode_chain_settings(**kwargs), **kwargs)
+
+# %% ../src/chains.ipynb 32
+class CeloChainCommon():
+    eth: Token = Token(token_address='CELO', symbol='CELO', decimals=18, listed=True, wrapped_token_address='0x471EcE3750Da237f93B8E339c536989b8978a438')
+
+class AsyncCeloChain(AsyncChain, CeloChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_celo_chain_settings(**kwargs), **kwargs)
+
+class CeloChain(Chain, CeloChainCommon):
+    def __init__(self, **kwargs): super().__init__(make_celo_chain_settings(**kwargs), **kwargs)
