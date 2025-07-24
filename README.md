@@ -125,8 +125,10 @@ Get a quote and swap:
 from sugar.chains import AsyncOPChain
 
 async with AsyncOPChain() as op:
-    quote = await op.get_quote(from_token=AsyncOPChain.velo, to_token=AsyncOPChain.eth, amount=10)
-    # check on quote to see if you are OK with the amount
+    quote = await op.get_quote(from_token=AsyncOPChain.velo, to_token=AsyncOPChain.eth, amount=AsyncOPChain.velo.parse_units(10))
+    if not quote:
+        # no quote found 
+    # check quote.amount_out
     await op.swap_from_quote(quote)
 ```
 
@@ -136,12 +138,34 @@ async with AsyncOPChain() as op:
 from sugar.chains import AsyncOPChain
 
 async with AsyncOPChain() as op:
-    await op.swap(from_token=velo, to_token=eth, amount=10)
+    await op.swap(from_token=velo, to_token=eth, amount=velo.parse_units(10))
 ```
 
-> **NOTE**: amount you pass into quote/swap should be a float indicating
-> decimal amount of input token **NOT** amount in wei. Sugar runs
-> conversion for you behind the scenes
+## Superswaps
+
+```python
+from sugar import OPChain, LiskChain, Superswap
+
+superswap = Superswap()
+quote = superswap.get_super_quote(from_token=OPChain.velo, to_token=LiskChain.lsk, amount=OPChain.velo.parse_units(100))
+superswap.swap_from_quote(quote)
+
+# feeling lucky Superswap
+Superswap().swap(from_token=OPChain.velo, to_token=LiskChain.lsk, amount=OPChain.velo.parse_units(100))
+```
+
+As always, async version is also available
+
+```python
+from sugar import OPChain, LiskChain, AsyncSuperswap
+
+superswap = AsyncSuperswap()
+quote = await superswap.get_super_quote(from_token=OPChain.velo, to_token=LiskChain.lsk, amount=OPChain.velo.parse_units(100))
+await superswap.swap_from_quote(quote)
+
+# feeling lucky Superswap
+await AsyncSuperswap().swap(from_token=OPChain.velo, to_token=LiskChain.lsk, amount=OPChain.velo.parse_units(100))
+```
 
 ## Configuration
 
@@ -168,6 +192,10 @@ Full list of configuration parameters for Sugar. Chain IDs can be found
 | excluded_tokens_addrs | `SUGAR_EXCLUDED_TOKENS_ADDRS_<CHAIN_ID>` | chain specific |
 | price_batch_size | `SUGAR_PRICE_BATCH_SIZE` | 40 |
 | price_threshold_filter | `SUGAR_PRICE_THRESHOLD_FILTER` | 10 |
+| interchain_router_contract_addr | `SUGAR_INTERCHAIN_ROUTER_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
+| bridge_contract_addr | `SUGAR_BRIDGE_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
+| bridge_token_addr | `SUGAR_BRIDGE_TOKEN_ADDR_<CHAIN_ID>` | chain specific |
+| message_module_contract_addr | `SUGAR_MESSAGE_MODULE_CONTRACT_ADDR_<CHAIN_ID>` | chain specific |
 | pool_page_size | `SUGAR_POOL_PAGE_SIZE` | 500 |
 | pools_count_upper_bound | `POOLS_COUNT_UPPER_BOUND_<CHAIN_ID>` | 2500 |
 | pagination_limit | `SUGAR_PAGINATION_LIMIT` | 2000 |
@@ -223,3 +251,9 @@ Etherscan](https://optimistic.etherscan.io/).
 - keep an eye on the latest sugar contract deployment for your favorite
   chain
   [here](https://github.com/velodrome-finance/sugar/tree/main/deployments)
+- latest universal router contract (referred to as "swapper" in this sdk) deployment can be found [here](https://github.com/velodrome-finance/universal-router/tree/main/deployment-addresses)
+
+## Chores and random release related gymnastics
+
+- getting one file diff for LLM ingestion (skipping notebooks and ABIs):
+    `git diff main YOUR_NEW_BRANCH --output=YOUR_NEW_BRANCH.diff ':(exclude)src/*.ipynb' ':(exclude)sugar/_modidx.py' ':(exclude)sugar/abis/*.json'`
