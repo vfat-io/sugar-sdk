@@ -121,7 +121,7 @@ def make_op_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettings
     d = {
         "rpc_uri": "https://optimism-mainnet.wallet.coinbase.com",
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
-        "sugar_contract_addr": "0xA64db2D254f07977609def75c3A7db3eDc72EE1D",
+        "sugar_contract_addr": "0x766133beae539ed33a7e27dfa3a840deaad88947",
         "sugar_rewards_contract_addr": "0x62CCFB2496f49A80B0184AD720379B529E9152fB",
         "slipstream_contract_addr": "0xD45624bf2CB9f65ecbdF3067d21992b099b56202",
         "nfpm_contract_addr": "0x416b433906b1B72FA758e166e239c43d68dC6F29",
@@ -142,7 +142,7 @@ def make_base_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "rpc_uri": "https://mainnet.base.org",
         "pools_count_upper_bound": 9000,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
-        "sugar_contract_addr": "0x6F8Ea68A1a66e49e16A470bcF6fe2A3a7b94CDe9",
+        "sugar_contract_addr": "0x01cba9e44ad356bad5e2d616357b69cb406248ac",
         "sugar_rewards_contract_addr": "0xA44600F4DBA6683d8BD99270B1A6a143fB9F1C3B",
         "slipstream_contract_addr": "0x0AD09A66af0154a84e86F761313d02d0abB6edd5",
         "nfpm_contract_addr": "0x827922686190790b37229fd06084350E74485b72",
@@ -164,7 +164,7 @@ def make_uni_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSetting
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         "interchain_account_addr": "0x1174A4719FaF964AfE2179A404b4830EC0DCB8D5",
-        "sugar_contract_addr": "0x154c0F8331B0B4af1384A2dFa67AADCa5Fd92C20",
+        "sugar_contract_addr": "0xcaa7d54453964773fe04b5ad32d06322fc9d9fe4",
         "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",
         "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",
         "nfpm_contract_addr": "0x991d5546C4B442B4c5fdc4c8B8b8d131DEB24702",
@@ -186,7 +186,7 @@ def make_soneium_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSet
         "pools_count_upper_bound": 20,#
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",
         #"interchain_account_addr": "0x1174A4719FaF964AfE2179A404b4830EC0DCB8D5",
-        "sugar_contract_addr": "0x0771B5B979230E29140774C1dc441a9fDddD28bD",
+        "sugar_contract_addr": "0x107F6d607f780B7B4E5148FE973777a6c72448Ee",
         "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",
         "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",
         "nfpm_contract_addr": "0x991d5546C4B442B4c5fdc4c8B8b8d131DEB24702",
@@ -207,7 +207,7 @@ def make_fraxtal_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSet
         "rpc_uri": "https://rpc.frax.com",
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0xFC00000000000000000000000000000000000006",#
-        "sugar_contract_addr": "0x74f18F46d20750Cab0d3fE75Ca0395bdB8016fD1",#
+        "sugar_contract_addr": "0x4ea3301ab7fbedb21e70a01e242212b5ad0af6fe",#
         "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",#
         "slipstream_contract_addr": "0x593D092BB28CCEfe33bFdD3d9457e77Bd3084271",#
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
@@ -228,7 +228,7 @@ def make_ink_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSetting
         "rpc_uri": "https://rpc-gel.inkonchain.com",
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
-        "sugar_contract_addr": "0x471C34138D06001AEe399af9EBEbbdF680b966B3",#
+        "sugar_contract_addr": "0x154c0F8331B0B4af1384A2dFa67AADCa5Fd92C20",#
         "sugar_rewards_contract_addr": "0xc100DC20aff9907E833a6aDEDDB52fC310554fF2",#
         "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",#
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
@@ -250,7 +250,7 @@ def make_lisk_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
         "sugar_contract_addr": "0x1443c0757f77c04bd514427d2bE356A5834E4167",#
-        "sugar_rewards_contract_addr": "0xB1d0DFFe6260982164B53EdAcD3ccd58B081889d",#
+        "sugar_rewards_contract_addr": "0x9fCd211cc23E24352C3A17d353C6b3ECbeb6fAc2",#
         "slipstream_contract_addr": "0xB98fB4C9C99dE155cCbF5A14af0dBBAd96033D6f",
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
         "price_oracle_contract_addr": "0x024503003fFE9AF285f47c1DaAaA497D9f1166D0",#
@@ -271,7 +271,7 @@ def make_metal_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSetti
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
         "sugar_contract_addr": "0x471C34138D06001AEe399af9EBEbbdF680b966B3",#
-        "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",#
+        "sugar_rewards_contract_addr": "0x154c0F8331B0B4af1384A2dFa67AADCa5Fd92C20",#
         "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",#
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
         "price_oracle_contract_addr": "0x3e71CCdf495d9628D3655A600Bcad3afF2ddea98",#
@@ -291,7 +291,7 @@ def make_swell_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSetti
         "rpc_uri": "https://swell-mainnet.alt.technology",
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
-        "sugar_contract_addr": "0x154c0F8331B0B4af1384A2dFa67AADCa5Fd92C20",#
+        "sugar_contract_addr": "0x74f18F46d20750Cab0d3fE75Ca0395bdB8016fD1",#
         "sugar_rewards_contract_addr": "0xbDD1d5A9d9566F575bC59cE33C8F77ACa5cF924b",#
         "slipstream_contract_addr": "0x222ed297aF0560030136AE652d39fa40E1B72818",#
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
@@ -312,7 +312,7 @@ def make_mode_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "rpc_uri": "https://mainnet.mode.network",
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x4200000000000000000000000000000000000006",#
-        "sugar_contract_addr": "0x6eA93e8d5059D4bd986F24a46546E930e0d0Fa82",#
+        "sugar_contract_addr": "0x87d729D7Cc6524604d694fc371d770F0d882E35b",#
         "sugar_rewards_contract_addr": "0xD5d3ABAcB8CF075636792658EE0be8B03AF517B8",#
         "slipstream_contract_addr": "0xD24a61656AB0d70994Ef5F42fE11AA95c0a1d329",#
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
@@ -333,7 +333,7 @@ def make_celo_chain_settings(get_env: GetEnv = get_env, **kwargs) -> ChainSettin
         "rpc_uri": "https://forno.celo.org",
         "pools_count_upper_bound": 20,
         "wrapped_native_token_addr": "0x471EcE3750Da237f93B8E339c536989b8978a438",#
-        "sugar_contract_addr": "0x74f18F46d20750Cab0d3fE75Ca0395bdB8016fD1",#
+        "sugar_contract_addr": "0x2002618dd63228670698200069e42f4422e82497",#
         "sugar_rewards_contract_addr": "0x2DCD9B33F0721000Dc1F8f84B804d4CFA23d7713",#
         "slipstream_contract_addr": "0x928bb6c9097d5c9c1eb5e99e71e24e4d773f2be5",#
         "nfpm_contract_addr": "0x991d5546c4b442b4c5fdc4c8b8b8d131deb24702",#
